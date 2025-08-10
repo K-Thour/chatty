@@ -1,0 +1,15 @@
+import express from 'express';
+import dotenv from 'dotenv';
+import routes from './routes/index.js';
+import database from './libs/database/index.js';
+dotenv.config();
+const app=express();
+
+const port=process.env.PORT||3000;
+const baseUrl="api/v1";
+app.use(`${baseUrl}/auth`,routes.authRoutes);
+
+app.listen(port,async ()=>{
+    await database.connectDB();
+    console.log(`Server is running on port ${port}`);
+});
