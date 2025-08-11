@@ -84,6 +84,79 @@ router.post(
   authControllers.auth.signUp
 );
 
-router.post("/login", authControllers.auth.login);
+/**
+ * @swagger
+ * /api/v1/auth/login:
+ *   post:
+ *     summary: User login
+ *     description: Authenticates a user with email and password, returning a success message or authentication token.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: johndoe@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: Passw0rd!
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User logged in successfully
+ *       400:
+ *         description: Validation errors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       msg:
+ *                         type: string
+ *                         example: Invalid email format
+ *                       param:
+ *                         type: string
+ *                         example: email
+ *                       location:
+ *                         type: string
+ *                         example: body
+ *       401:
+ *         description: Invalid email or password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid credentials
+ */
+router.post(
+  "/login",
+  authValidator.signUp.loginValidation,
+  authControllers.auth.login
+);
 
 export default router;

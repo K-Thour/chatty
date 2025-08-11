@@ -1,7 +1,6 @@
 import { validationResult } from "express-validator";
 import User from "../models/user.model.js";
-import { generateJWT, hashPassword } from "../libs/utils.js";
-
+import { comparePassword, generateJWT, hashPassword } from "../libs/utils.js";
 
 const signUp = async (req, res) => {
   const { name, email, password } = req.body;
@@ -37,8 +36,32 @@ const signUp = async (req, res) => {
   }
 };
 
-const login = (req, res) => {
-  res.send("User logged in successfully");
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+      });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    generateJWT(user._id, res);
+    res.send({ message: "User logged in successfully" });
+  } catch (error) {
+    console.error("Error during login:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export default {
