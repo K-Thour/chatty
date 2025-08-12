@@ -29,13 +29,14 @@ const signUp = async (req, res) => {
     }
     const savedUser = await newUser.save();
     generateJWT(savedUser._id, res);
-    res.status(201).json({ message: "User registered successfully",
+    res.status(201).json({
+      message: "User registered successfully",
       user: {
         id: savedUser._id,
         name: savedUser.name,
         email: savedUser.email,
       },
-     });
+    });
   } catch (error) {
     console.error("Error during sign up:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -63,15 +64,26 @@ const login = async (req, res) => {
     }
 
     generateJWT(user._id, res);
-    res.status(200).json({ message: "User logged in successfully",
+    res.status(200).json({
+      message: "User logged in successfully",
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
       },
-     });
+    });
   } catch (error) {
     console.error("Error during login:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const logout = (req, res) => {
+  try {
+    res.clearCookie("token");
+    res.status(200).json({ message: "User logged out successfully" });
+  } catch (error) {
+    console.error("Error during logout:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -79,4 +91,5 @@ const login = async (req, res) => {
 export default {
   signUp,
   login,
+  logout,
 };
