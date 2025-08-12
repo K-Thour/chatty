@@ -1,4 +1,4 @@
-import { replaceImage } from "../libs/cloudinary/cloudinary";
+import { replaceImage } from "../libs/cloudinary/cloudinary.js";
 
 const updateProfile = async (req, res) => {
   const { name, description, profilePicture } = req.body;
