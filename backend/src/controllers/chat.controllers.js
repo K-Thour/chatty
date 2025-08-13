@@ -1,4 +1,5 @@
 import { uploadImage } from "../libs/cloudinary/cloudinary.js";
+import Chat from "../models/chat.model.js";
 import User from "../models/user.model.js";
 
 const getUsers = async (req, res) => {
@@ -35,9 +36,9 @@ const getMessages = async (req, res) => {
       message: "Messages fetched successfully",
       messages: messages.map((msg) => ({
         id: msg._id,
-        sender: msg.sender,
-        receiver: msg.receiver,
-        content: msg.content,
+        senderId: msg.senderId,
+        receiverId: msg.receiverId,
+        message: msg.message,
         createdAt: msg.createdAt,
       })),
     });
@@ -50,22 +51,21 @@ const getMessages = async (req, res) => {
 const sendMessage=async (req, res) => {
   const { id: receiverId } = req.params;
   const senderId = req.user._id;
-  const { message,image } = req.body;
   try {
-    if(!message && !image) {
+    if(!req.body.message && !req.body.image) {
       return res.status(400).json({ message: "Message content is required" });
     }
     let imageUrl = null;
-    if (image) {
+    if (req.body.image) {
       imageUrl = await uploadImage(image, senderId);
       if (!imageUrl) {
         return res.status(500).json({ message: "Image upload failed" });
       }
     }
-    const newMessage = new Message({
-      sender: senderId,
-      receiver: receiverId,
-      content: message,
+    const newMessage = new Chat({
+      senderId: senderId,
+      receiverId: receiverId,
+      message: req.body.message||"",
       image: imageUrl,
     });
     await newMessage.save();
@@ -73,9 +73,9 @@ const sendMessage=async (req, res) => {
       message: "Message sent successfully",
       messageData: {
         id: newMessage._id,
-        sender: newMessage.sender,
-        receiver: newMessage.receiver,
-        content: newMessage.content,
+        sender: newMessage.senderId,
+        receiver: newMessage.receiverId,
+        message: newMessage.message,
         image: newMessage.image,
         createdAt: newMessage.createdAt,
       },

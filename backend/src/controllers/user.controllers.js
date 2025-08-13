@@ -1,15 +1,17 @@
 import { replaceImage } from "../libs/cloudinary/cloudinary.js";
+import User from "../models/user.model.js";
 
 const updateProfile = async (req, res) => {
-  const { name, description, profilePicture } = req.body;
   try {
     const userId = req.user._id;
     const updatedData = {};
-
-    if (name) updatedData.name = name;
-    if (description) updatedData.description = description;
-    if (profilePicture) {
-      const pictureUrl = await replaceImage(profilePicture, userId);
+    if(!(req.body?.name || req.body?.description || req.body?.profilePicture)) {
+      return res.status(400).json({ message: "No fields to update" });
+    }
+    if (req.body?.name) updatedData.name = req.body.name;
+    if (req.body?.description) updatedData.description = req.body.description;
+    if (req.body?.profilePicture) {
+      const pictureUrl = await replaceImage(req.body.profilePicture, userId);
       updatedData.profilePicture = pictureUrl;
     }
 

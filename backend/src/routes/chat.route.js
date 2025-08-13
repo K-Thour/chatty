@@ -8,6 +8,6 @@ router.get('/users',protect,controllers.chat.getUsers);
 
 router.get('/messages/:id', protect, controllers.chat.getMessages);
 
-router.post('/messages/:id', protect,controllers.chat.sendMessage);
+router.post('/sendmessage/:id', protect,controllers.chat.sendMessage);
 
 export default router;
