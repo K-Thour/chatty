@@ -5,7 +5,9 @@ const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
     const updatedData = {};
-    if(!(req.body?.name || req.body?.description || req.body?.profilePicture)) {
+    if (
+      !(req.body?.name || req.body?.description || req.body?.profilePicture)
+    ) {
       return res.status(400).json({ message: "No fields to update" });
     }
     if (req.body?.name) updatedData.name = req.body.name;

@@ -1,2 +1,2 @@
-import connectDB from './database.service.js';
+import connectDB from "./database.service.js";
 export default { connectDB };

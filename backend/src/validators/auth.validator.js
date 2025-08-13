@@ -10,7 +10,7 @@ const signupValidation = [
     .withMessage("Password must be at least 8 characters long")
     .matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/)
     .withMessage(
-      "Password must include one uppercase letter, one number, and one special character"
+      "Password must include one uppercase letter, one number, and one special character",
     )
     .notEmpty()
     .withMessage("Password is required"),
@@ -23,7 +23,7 @@ const loginValidation = [
     .withMessage("Password must be at least 8 characters long")
     .matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/)
     .withMessage(
-      "Password must include one uppercase letter, one number, and one special character"
+      "Password must include one uppercase letter, one number, and one special character",
     )
     .notEmpty()
     .withMessage("Password is required"),

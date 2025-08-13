@@ -10,7 +10,6 @@ import controllers from "../controllers/index.js";
  *   description: User profile management
  */
 
-
 /**
  * @swagger
  * /update:
@@ -56,7 +55,6 @@ import controllers from "../controllers/index.js";
  *         description: Unauthorized (no or invalid token)
  */
 router.put("/update", middlewares.protect, controllers.user.updateProfile);
-
 
 /**
  * @swagger

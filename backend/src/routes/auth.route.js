@@ -81,7 +81,7 @@ const router = express.Router();
 router.post(
   "/signup",
   authValidator.signUp.signupValidation,
-  authControllers.auth.signUp
+  authControllers.auth.signUp,
 );
 
 /**
@@ -156,7 +156,7 @@ router.post(
 router.post(
   "/login",
   authValidator.signUp.loginValidation,
-  authControllers.auth.login
+  authControllers.auth.login,
 );
 
 /**

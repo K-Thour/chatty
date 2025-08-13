@@ -48,11 +48,11 @@ const getMessages = async (req, res) => {
   }
 };
 
-const sendMessage=async (req, res) => {
+const sendMessage = async (req, res) => {
   const { id: receiverId } = req.params;
   const senderId = req.user._id;
   try {
-    if(!req.body.message && !req.body.image) {
+    if (!req.body.message && !req.body.image) {
       return res.status(400).json({ message: "Message content is required" });
     }
     let imageUrl = null;
@@ -65,7 +65,7 @@ const sendMessage=async (req, res) => {
     const newMessage = new Chat({
       senderId: senderId,
       receiverId: receiverId,
-      message: req.body.message||"",
+      message: req.body.message || "",
       image: imageUrl,
     });
     await newMessage.save();
@@ -84,7 +84,7 @@ const sendMessage=async (req, res) => {
     console.error("Error sending message:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export default {
   getUsers,
