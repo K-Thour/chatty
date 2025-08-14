@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import { getProfile, login, signUp } from '../lib/axios';
+import { getProfile, login, logout, signUp } from '../lib/axios';
 
 export const useAuthStore = create((set) => ({
     authUser: null,
@@ -26,6 +26,15 @@ export const useAuthStore = create((set) => ({
         } catch (error) {
             console.error("Login failed:", error);
             set({ isLoggingIn: false });
+            throw error;
+        }
+    },
+    logout: async () => {
+        try {
+            await logout();
+            set({ authUser: null });
+        } catch (error) {
+            console.error("Logout failed:", error);
             throw error;
         }
     },

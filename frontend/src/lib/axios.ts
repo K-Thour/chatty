@@ -39,5 +39,15 @@ export const signUp = async (data: any) => {
   }
 };
 
+export const logout = async () => {
+  try {
+    const response = await instance.post("/auth/logout");
+    return response.data;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+};
+
 
 export default instance;

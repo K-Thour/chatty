@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Homepage from "./pages/Homepage";
 import SignUpPage from "./pages/SignUpPage";
@@ -11,28 +11,29 @@ import { Toaster } from "react-hot-toast";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth }: any = useAuthStore();
+  const location= useLocation();
 
-  useEffect(() => {
-    if (!authUser) {
-      checkAuth();
-    }
-  }, [checkAuth]);
+  // useEffect(() => {
+  //   if (!authUser) {
+  //     checkAuth();
+  //   }
+  // }, [checkAuth]);
 
-  if (isCheckingAuth && !authUser) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+  // if (isCheckingAuth && !authUser) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+  //     </div>
+  //   );
+  // }
   return (
     <>
-      <Navbar />
+      {location.pathname!=='/signup' && location.pathname!=='/login' && <Navbar />}
 
       <Routes>
         <Route
           path="/"
-          element={authUser ? <Homepage /> : <Navigate to="/login" />}
+          element={!authUser ? <Homepage /> : <Navigate to="/login" />}
         />
         <Route
           path="/signup"
