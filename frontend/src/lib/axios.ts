@@ -19,4 +19,25 @@ export const getProfile = async () => {
   }
 };
 
+export const login = async (data: any) => {
+  try {
+    const response = await instance.post("/auth/login", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error logging in:", error);
+    throw error;
+  }
+};
+
+export const signUp = async (data: any) => {
+  try {
+    const response = await instance.post("/auth/signup", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error signing up:", error);
+    throw error;
+  }
+};
+
+
 export default instance;
