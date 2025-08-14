@@ -13,19 +13,19 @@ function App() {
   const { authUser, checkAuth, isCheckingAuth }: any = useAuthStore();
   const location= useLocation();
 
-  // useEffect(() => {
-  //   if (!authUser) {
-  //     checkAuth();
-  //   }
-  // }, [checkAuth]);
+  useEffect(() => {
+    if (!authUser) {
+      checkAuth();
+    }
+  }, [checkAuth]);
 
-  // if (isCheckingAuth && !authUser) {
-  //   return (
-  //     <div className="flex items-center justify-center h-screen">
-  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
-  //     </div>
-  //   );
-  // }
+  if (isCheckingAuth && !authUser) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
   return (
     <>
       {location.pathname!=='/signup' && location.pathname!=='/login' && <Navbar />}
@@ -33,7 +33,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={!authUser ? <Homepage /> : <Navigate to="/login" />}
+          element={authUser ? <Homepage /> : <Navigate to="/login" />}
         />
         <Route
           path="/signup"
