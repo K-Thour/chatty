@@ -13,14 +13,13 @@ const updateProfile = async (req, res) => {
     if (req.body?.name) updatedData.name = req.body.name;
     if (req.body?.description) updatedData.description = req.body.description;
     if (req.body?.profilePicture) {
-      const pictureUrl = await replaceImage(req.body.profilePicture, userId);
-      updatedData.profilePicture = pictureUrl;
+      const profilePicture = await replaceImage(req.body.profilePicture, userId);
+      updatedData.profilePicture = profilePicture;
     }
 
     const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {
       new: true,
     }).select("-password");
-
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -32,7 +31,8 @@ const updateProfile = async (req, res) => {
         name: updatedUser.name,
         email: updatedUser.email,
         description: updatedUser.description,
-        profilePicture: updatedUser.profilePicture,
+        profilePicture: updatedUser.profilePicture || "",
+        createdAt: updatedUser.createdAt,
       },
     });
   } catch (error) {
@@ -50,6 +50,7 @@ const getProfile = (req, res) => {
         email: req.user.email,
         description: req.user.description,
         profilePicture: req.user.profilePicture,
+        createdAt: req.user.createdAt,
       },
     });
   } catch (error) {
