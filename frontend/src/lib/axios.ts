@@ -3,7 +3,7 @@ import axios from "axios";
 const instance = axios.create({
   baseURL: "http://localhost:5000/api/v1", // Adjust the base URL as needed
   withCredentials: true, // Include credentials for cross-origin requests
-  timeout: 10000, // Set a timeout for requests
+  timeout: 20000, // Set a timeout for requests
   headers: {
     "Content-Type": "application/json",
   },
@@ -31,12 +31,10 @@ export const login = async (data: any) => {
 
 export const signUp = async (data: any) => {
   try {
-    console.log(data);
     const response = await instance.post("/auth/signup", data);
     return response.data;
   } catch (error) {
     console.error("Error signing up:", error);
-    console.log(error);
     throw error;
   }
 };
@@ -51,5 +49,15 @@ export const logout = async () => {
   }
 };
 
+
+export const updateProfile = async (data: any) => {
+  try {
+    const response = await instance.put("/user/update", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    throw error;
+  }
+};
 
 export default instance;

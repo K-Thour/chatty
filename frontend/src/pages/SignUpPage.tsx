@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 function SignUpPage() {
   const navigate = useNavigate();
@@ -114,22 +115,24 @@ function SignUpPage() {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Password</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              value={formData.password}
-              placeholder="Enter your password"
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-200"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="mt-1 text-sm text-blue-500 hover:underline"
-            >
-              {showPassword ? "Hide Password" : "Show Password"}
-            </button>
+            <div className="flex focus:ring focus:ring-blue-200 border rounded focus:outline-none items-center">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                placeholder="Enter your password"
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                className="w-full px-3 py-2 "
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="me-3 text-sm text-blue-500 hover:underline"
+              >
+                {showPassword ? <Eye/> : <EyeOff/>}
+              </button>
+            </div>
           </div>
           <button
             type="submit"

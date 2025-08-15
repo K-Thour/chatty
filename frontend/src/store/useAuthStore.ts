@@ -1,6 +1,7 @@
 import {create} from 'zustand';
-import { getProfile, login, logout, signUp } from '../lib/axios';
+import { getProfile, login, logout, signUp, updateProfile } from '../lib/axios';
 import toast from 'react-hot-toast';
+import { data } from 'react-router-dom';
 
 export const useAuthStore = create((set) => ({
     authUser: null,
@@ -51,6 +52,19 @@ export const useAuthStore = create((set) => ({
         } catch (error) {
             console.error("Authentication check failed:", error);
             set({ authUser: null, isCheckingAuth: false });
+        }
+    },
+    updateProfile: async (data: any) => {
+        set({ isUpdatingProfile: true });
+        try {
+            const user = await updateProfile(data);
+            set({ authUser: user, isUpdatingProfile: false });
+            toast.success("Profile updated successfully!");
+        } catch (error:any) {
+            toast.error(error.response?.data?.message || "Profile update failed");
+            console.error("Profile update failed:", error);
+            set({ isUpdatingProfile: false });
+            throw error;
         }
     }
 }));
