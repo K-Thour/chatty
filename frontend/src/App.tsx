@@ -14,11 +14,9 @@ function App() {
   const location= useLocation();
 
   useEffect(() => {
-    if (!authUser) {
-      checkAuth();
-    }
+  if(!authUser)
+    checkAuth();
   }, [checkAuth]);
-
   if (isCheckingAuth && !authUser) {
     return (
       <div className="flex items-center justify-center h-screen">

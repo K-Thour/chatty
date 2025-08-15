@@ -31,10 +31,12 @@ export const login = async (data: any) => {
 
 export const signUp = async (data: any) => {
   try {
+    console.log(data);
     const response = await instance.post("/auth/signup", data);
     return response.data;
   } catch (error) {
     console.error("Error signing up:", error);
+    console.log(error);
     throw error;
   }
 };

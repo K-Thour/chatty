@@ -7,7 +7,7 @@ function SignUpPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
   });
@@ -15,7 +15,7 @@ function SignUpPage() {
   const { isSigningUp, signUp }: any = useAuthStore();
 
   const validateForm: any = () => {
-    if (!formData.username || !formData.email || !formData.password) {
+    if (!formData.name || !formData.email || !formData.password) {
       toast.error("All fields are required");
       return false;
     }
@@ -57,11 +57,11 @@ function SignUpPage() {
       toast.error("Email must be at least 5 characters long");
       return false;
     }
-    if (formData.username.length < 3) {
+    if (formData.name.length < 3) {
       toast.error("Username must be at least 3 characters long");
       return false;
     }
-    if (formData.username.length > 20) {
+    if (formData.name.length > 20) {
       toast.error("Username cannot exceed 20 characters");
       return false;
     }
@@ -71,13 +71,11 @@ function SignUpPage() {
     e.preventDefault();
     if (!validateForm()) return;
     setIsSubmitting(true);
-    toast.error("");
     try {
       await signUp(formData);
-      toast.success("Sign up successful! Redirecting to login...");
       navigate("/");
     } catch (err: any) {
-      toast.error(err.message || "Sign up failed");
+      toast.error(err.response.data.message || "Sign up failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -94,10 +92,10 @@ function SignUpPage() {
             <label className="block text-sm font-medium mb-2">Username</label>
             <input
               type="text"
-              value={formData.username}
+              value={formData.name}
               placeholder="Enter your username"
               onChange={(e) =>
-                setFormData({ ...formData, username: e.target.value })
+                setFormData({ ...formData, name: e.target.value })
               }
               className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-200"
             />

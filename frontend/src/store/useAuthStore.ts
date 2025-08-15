@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import { getProfile, login, logout, signUp } from '../lib/axios';
+import toast from 'react-hot-toast';
 
 export const useAuthStore = create((set) => ({
     authUser: null,
@@ -12,6 +13,8 @@ export const useAuthStore = create((set) => ({
         try {
             const user = await signUp(data);
             set({ authUser: user, isSigningUp: false });
+            toast.success("Sign Up successful! Redirecting to homepage...");
+            toast.success(`Welcome, ${user?.user?.name || user?.user?.email}!`);
         } catch (error) {
             console.error("Sign up failed:", error);
             set({ isSigningUp: false });
@@ -23,6 +26,8 @@ export const useAuthStore = create((set) => ({
         try {
             const user = await login(data);
             set({ authUser: user, isLoggingIn: false });
+            toast.success("Log In successful! Redirecting to homepage...");
+            toast.success(`Welcome back, ${user?.user?.name || user?.user?.email}!`);
         } catch (error) {
             console.error("Login failed:", error);
             set({ isLoggingIn: false });

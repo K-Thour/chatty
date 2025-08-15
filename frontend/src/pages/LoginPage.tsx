@@ -56,13 +56,11 @@ function LoginPage() {
     e.preventDefault();
     if (!validateForm()) return;
     setIsSubmitting(true);
-    toast.error("");
     try {
       await login(formData);
-      toast.success("Log In successful! Redirecting to login...");
       navigate("/");
     } catch (err: any) {
-      toast.error(err.message || "Log In failed");
+      console.log(err);
     } finally {
       setIsSubmitting(false);
     }
