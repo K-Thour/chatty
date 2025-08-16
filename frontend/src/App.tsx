@@ -8,9 +8,11 @@ import ProfilePage from "./pages/ProfilePage";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
+import { useThemeStore } from "./store/useThemeStore";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth }: any = useAuthStore();
+  const { theme, setTheme } = useThemeStore();
   const location= useLocation();
 
   useEffect(() => {
@@ -25,7 +27,7 @@ function App() {
     );
   }
   return (
-    <div data-theme="dracula">
+    <div data-theme={theme} className="h-250">
       {location.pathname!=='/signup' && location.pathname!=='/login' && <Navbar />}
 
       <Routes>
