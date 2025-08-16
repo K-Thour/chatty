@@ -26,10 +26,16 @@ const getMessages = async (req, res) => {
   const { id: secondPersonId } = req.params;
   try {
     const userId = req.user._id;
-    const messages = await Message.find({
+    console.log(
+      "Fetching messages for user:",
+      userId,
+      "and second person is:",
+      secondPersonId
+    );
+    const messages = await Chat.find({
       $or: [
-        { sender: userId, receiver: secondPersonId },
-        { sender: secondPersonId, receiver: userId },
+        { senderId: userId, receiverId: secondPersonId },
+        { senderId: secondPersonId, receiverId: userId },
       ],
     }).sort({ createdAt: 1 });
     res.status(200).json({
@@ -57,7 +63,7 @@ const sendMessage = async (req, res) => {
     }
     let imageUrl = null;
     if (req.body.image) {
-      imageUrl = await uploadImage(image, senderId);
+      imageUrl = await uploadImage(req.body.image);
       if (!imageUrl) {
         return res.status(500).json({ message: "Image upload failed" });
       }
@@ -73,8 +79,8 @@ const sendMessage = async (req, res) => {
       message: "Message sent successfully",
       messageData: {
         id: newMessage._id,
-        sender: newMessage.senderId,
-        receiver: newMessage.receiverId,
+        senderId: newMessage.senderId,
+        receiverId: newMessage.receiverId,
         message: newMessage.message,
         image: newMessage.image,
         createdAt: newMessage.createdAt,
