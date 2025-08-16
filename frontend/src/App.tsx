@@ -27,7 +27,7 @@ function App() {
     );
   }
   return (
-    <div data-theme={theme} className="h-250">
+    <div data-theme={theme} className="h-auto">
       {location.pathname!=='/signup' && location.pathname!=='/login' && <Navbar />}
 
       <Routes>

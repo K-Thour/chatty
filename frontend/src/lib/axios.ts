@@ -60,4 +60,34 @@ export const updateProfile = async (data: any) => {
   }
 };
 
+export const getUsers = async () => {
+  try {
+    const response = await instance.get("/chat/users");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+};
+
+export const getMessages = async (userId:string) => {
+  try {
+    const response = await instance.get(`/chat/messages/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    throw error;
+  }
+};
+
+export const sendMessage = async (userId:string, message:any) => {
+  try {
+    const response = await instance.post(`/chat/sendMessage/${userId}`, message);
+    return response.data;
+  } catch (error) {
+    console.error("Error sending message:", error);
+    throw error;
+  }
+};
+
 export default instance;
