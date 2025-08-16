@@ -30,6 +30,7 @@ const ChatContainer = () => {
     // subscribeToMessages,
     // unsubscribeFromMessages,
   ]);
+  console.log(messages.map((msg:any) => msg));
 
   useEffect(() => {
     if (messageEndRef.current && messages) {
@@ -56,7 +57,7 @@ const ChatContainer = () => {
           <div
             key={message.id || index}
             className={`chat ${
-              message.sender === authUser.id ? "chat-end" : "chat-start"
+              message.senderId === authUser.user.id ? "chat-end" : "chat-start"
             }`}
             ref={messageEndRef}
           >
