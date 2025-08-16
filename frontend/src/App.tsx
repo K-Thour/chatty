@@ -25,7 +25,7 @@ function App() {
     );
   }
   return (
-    <>
+    <div data-theme="dracula">
       {location.pathname!=='/signup' && location.pathname!=='/login' && <Navbar />}
 
       <Routes>
@@ -48,7 +48,7 @@ function App() {
         />
       </Routes>
       <Toaster/>
-    </>
+    </div>
   );
 }
 
