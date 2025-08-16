@@ -45,6 +45,7 @@ const getMessages = async (req, res) => {
         senderId: msg.senderId,
         receiverId: msg.receiverId,
         message: msg.message,
+        image: msg.image,
         createdAt: msg.createdAt,
       })),
     });
