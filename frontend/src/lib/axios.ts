@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:5000/api/v1", // Adjust the base URL as needed
+  baseURL: import.meta.env.VITE_BACKEND_URL || "", // Adjust the base URL as needed
   withCredentials: true, // Include credentials for cross-origin requests
   timeout: 20000, // Set a timeout for requests
   headers: {
@@ -49,7 +49,6 @@ export const logout = async () => {
   }
 };
 
-
 export const updateProfile = async (data: any) => {
   try {
     const response = await instance.put("/user/update", data);
@@ -70,7 +69,7 @@ export const getUsers = async () => {
   }
 };
 
-export const getMessages = async (userId:string) => {
+export const getMessages = async (userId: string) => {
   try {
     const response = await instance.get(`/chat/messages/${userId}`);
     return response.data;
@@ -80,9 +79,12 @@ export const getMessages = async (userId:string) => {
   }
 };
 
-export const sendMessage = async (userId:string, message:any) => {
+export const sendMessage = async (userId: string, message: any) => {
   try {
-    const response = await instance.post(`/chat/sendMessage/${userId}`, message);
+    const response = await instance.post(
+      `/chat/sendMessage/${userId}`,
+      message
+    );
     return response.data;
   } catch (error) {
     console.error("Error sending message:", error);
