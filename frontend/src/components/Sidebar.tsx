@@ -3,6 +3,7 @@ import { useChatStore } from "../store/useChatStore";
 // import { useAuthStore } from "../store/useAuthStore";;
 import { Users } from "lucide-react";
 import SidebarSkeleton from "./Skeltons/SidebarSkelton";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Sidebar = () => {
   const {
@@ -13,18 +14,16 @@ const Sidebar = () => {
     isUsersLoading,
   }: any = useChatStore();
 
-  //   const { onlineUsers } = useAuthStore();
-  const onlineUsers: any[] = users;
+  const { onlineUsers }: any = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   useEffect(() => {
     getUsers();
   }, [getUsers]);
 
-  //   const filteredUsers = showOnlineOnly
-  //     ? users.filter((user: any) => onlineUsers.includes(user._id))
-  //     : users;
-  const filteredUsers = onlineUsers;
+  const filteredUsers = showOnlineOnly
+    ? users.filter((user: any) => onlineUsers.includes(user.id))
+    : users;
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
@@ -35,7 +34,6 @@ const Sidebar = () => {
           <Users className="size-6" />
           <span className="font-medium hidden lg:block">Contacts</span>
         </div>
-        {/* TODO: Online filter toggle */}
         <div className="mt-3 hidden lg:flex items-center gap-2">
           <label className="cursor-pointer flex items-center gap-2">
             <input
