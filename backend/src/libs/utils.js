@@ -8,6 +8,7 @@ export const generateJWT = (userId, res) => {
   const token = JWT.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
+  console.log("Secure cookie:", process.env.NODE_ENV === "production");
   res.cookie("token", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
