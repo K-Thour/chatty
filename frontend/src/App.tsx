@@ -12,7 +12,7 @@ import { useThemeStore } from "./store/useThemeStore";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth }: any = useAuthStore();
-  const { theme, setTheme } = useThemeStore();
+  const { theme } = useThemeStore();
   const location= useLocation();
 
   useEffect(() => {
