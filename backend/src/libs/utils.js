@@ -1,5 +1,8 @@
 import JWT from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const generateJWT = (userId, res) => {
   const token = JWT.sign({ userId }, process.env.JWT_SECRET, {
@@ -8,7 +11,7 @@ export const generateJWT = (userId, res) => {
   res.cookie("token", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: process.env.NODE_ENV !== "development",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "none",
   });
   return token;
