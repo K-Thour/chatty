@@ -9,8 +9,8 @@ dotenv.config();
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    origin: [process.env.CORS_ORIGIN , "http://localhost:5173"],
+    methods: ["GET", "POST"],
     credentials: true,
   },
 });
