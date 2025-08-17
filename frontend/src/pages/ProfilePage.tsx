@@ -1,4 +1,4 @@
-import { Camera, Check, Cross, Edit, Mail, User, X } from "lucide-react";
+import { Camera, Check, Edit, Mail, User, X } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useState } from "react";
 
