@@ -15,6 +15,12 @@ const io = new Server(server, {
   },
 });
 
+console.log("Socket.IO server initialized with CORS settings", {
+  origin: [process.env.CORS_ORIGIN, "http://localhost:5173"],
+  methods: ["GET", "POST"],
+  credentials: true,
+});
+
 const userSocketMap = {};
 
 export const getUserSocketId = (userId) => {

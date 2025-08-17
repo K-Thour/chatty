@@ -19,6 +19,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+console.log("CORS enabled", [process.env.CORS_ORIGIN, "http://localhost:5173"]);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
