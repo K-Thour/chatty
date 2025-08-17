@@ -4,6 +4,8 @@ import express from "express";
 
 const app = express();
 const server = http.createServer(app);
+import dotenv from "dotenv";
+dotenv.config();
 
 const io = new Server(server, {
   cors: {
@@ -12,6 +14,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+console.log("Socket server is running", process.env.CORS_ORIGIN);
 
 const userSocketMap = {};
 
