@@ -9,12 +9,11 @@ dotenv.config();
 
 const io = new Server(server, {
   cors: {
-    origin: [process.env.CORS_ORIGIN || "http://localhost:5173"],
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   },
 });
-console.log("Socket server is running", process.env.CORS_ORIGIN);
 
 const userSocketMap = {};
 
