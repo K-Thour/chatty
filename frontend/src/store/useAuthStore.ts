@@ -80,7 +80,7 @@ export const useAuthStore = create((set, get: any) => ({
   },
   connectSocket: () => {
     const { authUser, isSocketConnected } = get();
-    console.log(authUser,isSocketConnected);
+    console.log(authUser, isSocketConnected);
     if (!authUser || isSocketConnected) return;
     const socket = io(BACKEND_URL, {
       autoConnect: true,
