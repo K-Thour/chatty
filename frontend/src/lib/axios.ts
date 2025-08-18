@@ -2,9 +2,12 @@ import axios from "axios";
 import type {
   authDataType,
   authUserDataType,
+  getMessagesDataType,
   getProfileDataType,
   getUsersDataType,
   logoutDataType,
+  messageDataType,
+  sendMessageDataType,
   updateProfileDataType,
   userDataType,
 } from "../types.js";
@@ -94,7 +97,6 @@ export const updateProfile = async (
       "/user/update",
       data
     );
-    console.log("response----->88",  data);
     return response.data;
   } catch (error) {
     console.error("Error updating profile:", error);
@@ -108,7 +110,6 @@ export const getUsers = async (): Promise<{
 }> => {
   try {
     const response: getUsersDataType = await instance.get("/chat/users");
-    console.log("59---->response", response);
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -116,9 +117,16 @@ export const getUsers = async (): Promise<{
   }
 };
 
-export const getMessages = async (userId: string) => {
+export const getMessages = async (
+  userId: string
+): Promise<{
+  message: string;
+  messages: messageDataType[];
+}> => {
   try {
-    const response = await instance.get(`/chat/messages/${userId}`);
+    const response: getMessagesDataType = await instance.get(
+      `/chat/messages/${userId}`
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching messages:", error);
@@ -126,9 +134,15 @@ export const getMessages = async (userId: string) => {
   }
 };
 
-export const sendMessage = async (userId: string, message: any) => {
+export const sendMessage = async (
+  userId: string,
+  message: { image?: string; message?: string }
+): Promise<{
+  message: string;
+  messageData: messageDataType;
+}> => {
   try {
-    const response = await instance.post(
+    const response: sendMessageDataType = await instance.post(
       `/chat/sendMessage/${userId}`,
       message
     );
