@@ -7,7 +7,7 @@ const protect = async (req, res, next) => {
     if (req.cookies.token) {
       token = req.cookies.token;
     } else if (req.header.token) {
-      token = req.header.token;
+      token = req.header.Token;
     }
     if (!token) {
       return res.status(401).json({ message: "Unauthorized access" });
