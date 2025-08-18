@@ -6,7 +6,7 @@ const protect = async (req, res, next) => {
     let token;
     if (req.cookies.token) {
       token = req.cookies.token;
-    } else if (req.header.token) {
+    } else if (req.header.Token) {
       token = req.header.Token;
     }
     if (!token) {
