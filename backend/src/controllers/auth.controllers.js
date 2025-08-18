@@ -28,9 +28,10 @@ const signUp = async (req, res) => {
       return res.status(400).json({ message: "Invalid user data" });
     }
     const savedUser = await newUser.save();
-    generateJWT(savedUser._id, res);
+    const token=generateJWT(savedUser._id, res);
     res.status(201).json({
       message: "User registered successfully",
+      token,
       user: {
         id: savedUser._id,
         name: savedUser.name,
@@ -63,9 +64,10 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    generateJWT(user._id, res);
+    const token=generateJWT(user._id, res);
     res.status(200).json({
       message: "User logged in successfully",
+      token,
       user: {
         id: user._id,
         name: user.name,

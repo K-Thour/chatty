@@ -3,8 +3,12 @@ import User from "../models/user.model.js";
 
 const protect = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
-    console.log(req.cookies);
+    let token;
+    if (req.cookies.token) {
+      token = req.cookies.token;
+    } else if (req.header.token) {
+      token = req.header.token;
+    }
     if (!token) {
       return res.status(401).json({ message: "Unauthorized access" });
     }

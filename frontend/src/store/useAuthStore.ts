@@ -18,6 +18,7 @@ export const useAuthStore = create((set, get: any) => ({
     set({ isSigningUp: true });
     try {
       const user = await signUp(data);
+      localStorage.setItem("token",user.token);
       set({ authUser: user, isSigningUp: false });
       toast.success("Sign Up successful! Redirecting to homepage...");
       toast.success(`Welcome, ${user?.user?.name || user?.user?.email}!`);
@@ -33,6 +34,7 @@ export const useAuthStore = create((set, get: any) => ({
     set({ isLoggingIn: true });
     try {
       const user = await login(data);
+      localStorage.setItem("token",user.token);
       set({ authUser: user, isLoggingIn: false });
       toast.success("Log In successful! Redirecting to homepage...");
       toast.success(`Welcome back, ${user?.user?.name || user?.user?.email}!`);
@@ -48,6 +50,7 @@ export const useAuthStore = create((set, get: any) => ({
     try {
       await logout();
       set({ authUser: null });
+      localStorage.removeItem("token");
       get().disconnectSocket();
     } catch (error) {
       console.error("Logout failed:", error);

@@ -1,13 +1,26 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || "", // Adjust the base URL as needed
-  withCredentials: true, // Include credentials for cross-origin requests
-  timeout: 20000, // Set a timeout for requests
+  baseURL: import.meta.env.VITE_BACKEND_URL || "",
+  withCredentials: true,
+  timeout: 20000,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.token = token;
+    } else {
+      delete config.headers.token;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export const getProfile = async () => {
   try {
