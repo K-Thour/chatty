@@ -4,7 +4,7 @@ import User from "../models/user.model.js";
 const protect = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-    console.log(token);
+    console.log(req.cookies);
     if (!token) {
       return res.status(401).json({ message: "Unauthorized access" });
     }
