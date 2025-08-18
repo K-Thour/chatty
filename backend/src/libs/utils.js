@@ -11,9 +11,10 @@ export const generateJWT = (userId, res) => {
   console.log("Secure cookie:", process.env.NODE_ENV === "production");
   res.cookie("token", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
+    // httpOnly: false,
+    // secure: process.env.NODE_ENV === "production",
+    domain:"https://chatty-thour.netlify.app/",
+    sameSite: "lax",
     path: "/",
   });
   return token;
