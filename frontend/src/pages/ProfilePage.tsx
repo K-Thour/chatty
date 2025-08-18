@@ -1,9 +1,9 @@
 import { Camera, Check, Edit, Mail, User, X } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function ProfilePage() {
-  const { authUser, isUpdatingProfile, updateProfile }: any = useAuthStore();
+  const { authUser, isUpdatingProfile, updateProfile,checkAuth }: any = useAuthStore();
   const [selectedImg, setSelectedImg] = useState(
     authUser.user.profilePicture || ""
   );
@@ -34,7 +34,11 @@ function ProfilePage() {
     setIsUpdatingName(false);
     setIsUpdatingDescription(false);
   };
-  
+
+  useEffect(()=>{
+    checkAuth();
+  },[checkAuth])
+
   if (!authUser) {
     return (
       <div className="flex items-center justify-center h-screen">
