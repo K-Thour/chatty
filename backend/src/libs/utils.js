@@ -8,15 +8,13 @@ export const generateJWT = (userId, res) => {
   const token = JWT.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
-  console.log("Secure cookie:", process.env.NODE_ENV === "production");
+
   res.cookie("token", token, {
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: false,
-    // secure: process.env.NODE_ENV === "production",
-    Options: {
-      domain: "https://chatty-thour.netlify.app/",
-      sameSite: "lax",
-    },
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
+    domain: process.env.NODE_ENV === "production" ? "chatty-thour.netlify.app" : undefined,
     path: "/",
   });
   return token;
