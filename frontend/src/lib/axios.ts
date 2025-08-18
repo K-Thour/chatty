@@ -1,4 +1,13 @@
 import axios from "axios";
+import type {
+  authDataType,
+  authUserDataType,
+  getProfileDataType,
+  getUsersDataType,
+  logoutDataType,
+  updateProfileDataType,
+  userDataType,
+} from "../types.js";
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "",
@@ -22,9 +31,9 @@ instance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export const getProfile = async () => {
+export const getProfile = async (): Promise<{ user: userDataType }> => {
   try {
-    const response = await instance.get("/user/profile");
+    const response: getProfileDataType = await instance.get("/user/profile");
     return response.data;
   } catch (error) {
     console.error("Error checking authentication:", error);
@@ -32,9 +41,15 @@ export const getProfile = async () => {
   }
 };
 
-export const login = async (data: any) => {
+export const login = async (
+  data: any
+): Promise<{
+  message: string;
+  token: string;
+  user: authUserDataType;
+}> => {
   try {
-    const response = await instance.post("/auth/login", data);
+    const response: authDataType = await instance.post("/auth/login", data);
     return response.data;
   } catch (error) {
     console.error("Error logging in:", error);
@@ -42,9 +57,15 @@ export const login = async (data: any) => {
   }
 };
 
-export const signUp = async (data: any) => {
+export const signUp = async (
+  data: any
+): Promise<{
+  message: string;
+  token: string;
+  user: authUserDataType;
+}> => {
   try {
-    const response = await instance.post("/auth/signup", data);
+    const response: authDataType = await instance.post("/auth/signup", data);
     return response.data;
   } catch (error) {
     console.error("Error signing up:", error);
@@ -52,9 +73,9 @@ export const signUp = async (data: any) => {
   }
 };
 
-export const logout = async () => {
+export const logout = async (): Promise<{ message: string }> => {
   try {
-    const response = await instance.post("/auth/logout");
+    const response: logoutDataType = await instance.post("/auth/logout");
     return response.data;
   } catch (error) {
     console.error("Error logging out:", error);
@@ -62,9 +83,18 @@ export const logout = async () => {
   }
 };
 
-export const updateProfile = async (data: any) => {
+export const updateProfile = async (
+  data: any
+): Promise<{
+  message: string;
+  user: userDataType;
+}> => {
   try {
-    const response = await instance.put("/user/update", data);
+    const response: updateProfileDataType = await instance.put(
+      "/user/update",
+      data
+    );
+    console.log("response----->88",  data);
     return response.data;
   } catch (error) {
     console.error("Error updating profile:", error);
@@ -72,9 +102,13 @@ export const updateProfile = async (data: any) => {
   }
 };
 
-export const getUsers = async () => {
+export const getUsers = async (): Promise<{
+  message: string;
+  users: userDataType[];
+}> => {
   try {
-    const response = await instance.get("/chat/users");
+    const response: getUsersDataType = await instance.get("/chat/users");
+    console.log("59---->response", response);
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
