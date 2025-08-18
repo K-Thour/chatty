@@ -7,15 +7,37 @@ const getUsers = async (req, res) => {
   const userId = req.user._id;
   try {
     const users = await User.find({ _id: { $ne: userId } }).select("-password");
+
+    // get unread counts for each user
+    let usersWithUnread = await Promise.all(
+      users.map(async (user) => {
+        const unreadCount = await Chat.countDocuments({
+          sender: user._id,
+          receiver: userId,
+          isRead: false,
+        });
+
+        return {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          description: user.description,
+          profilePicture: user.profilePicture,
+          unreadCount,
+        };
+      })
+    );
+
+    // ✅ sort by unreadCount (highest first)
+    usersWithUnread = usersWithUnread.sort(
+      (a, b) => b.unreadCount - a.unreadCount
+    );
+
+    console.log(usersWithUnread);
+
     res.status(200).json({
       message: "Users fetched successfully",
-      users: users.map((user) => ({
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        description: user.description,
-        profilePicture: user.profilePicture,
-      })),
+      users: usersWithUnread,
     });
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -27,18 +49,16 @@ const getMessages = async (req, res) => {
   const { id: secondPersonId } = req.params;
   try {
     const userId = req.user._id;
-    console.log(
-      "Fetching messages for user:",
-      userId,
-      "and second person is:",
-      secondPersonId
-    );
     const messages = await Chat.find({
       $or: [
         { senderId: userId, receiverId: secondPersonId },
         { senderId: secondPersonId, receiverId: userId },
       ],
     }).sort({ createdAt: 1 });
+    await Chat.updateMany(
+      { senderId: secondPersonId, receiverId: userId, isRead: false },
+      { $set: { isRead: true } }
+    );
     res.status(200).json({
       message: "Messages fetched successfully",
       messages: messages.map((msg) => ({
@@ -78,9 +98,9 @@ const sendMessage = async (req, res) => {
     });
     await newMessage.save();
     // Emit the new message to the sender and receiver via socket.io
-    const recieverSocketId=getUserSocketId(receiverId);
-    if(recieverSocketId){
-      io.to(recieverSocketId).emit("newMessage",newMessage);
+    const recieverSocketId = getUserSocketId(receiverId);
+    if (recieverSocketId) {
+      io.to(recieverSocketId).emit("newMessage", newMessage);
     }
     res.status(201).json({
       message: "Message sent successfully",

@@ -18,10 +18,14 @@ const chatSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
-  },
+  }
 );
 const Chat = mongoose.model("Chat", chatSchema);
 export default Chat;
