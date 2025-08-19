@@ -8,7 +8,6 @@ const getUsers = async (req, res) => {
   try {
     const users = await User.find({ _id: { $ne: userId } }).select("-password");
 
-    // get unread counts for each user
     let usersWithUnread = await Promise.all(
       users.map(async (user) => {
         const unreadCount = await Chat.countDocuments({
@@ -28,7 +27,6 @@ const getUsers = async (req, res) => {
       })
     );
 
-    // ✅ sort by unreadCount (highest first)
     usersWithUnread = usersWithUnread.sort(
       (a, b) => b.unreadCount - a.unreadCount
     );
@@ -95,9 +93,7 @@ const sendMessage = async (req, res) => {
       image: imageUrl,
     });
     await newMessage.save();
-    // Emit the new message to the sender and receiver via socket.io
     const recieverSocketId = getUserSocketId(receiverId);
-    console.log("100----->",recieverSocketId);
     if (receiverId) {
       io.to(recieverSocketId).emit("newMessage", newMessage);
     }
