@@ -30,7 +30,11 @@ export const useChatStore = create((set, get) => ({
     set({ isMessagesLoading: true });
     try {
       const messages = await getMessages(userId);
-      set({ messages: messages.messages });
+      const { users } = get() as { users: userDataType[] };
+      const updatedUsers = users.map((u) =>
+        u.id === userId ? { ...u, unreadCount: 0 } : u
+      );
+      set({ messages: messages.messages, users: updatedUsers });
     } catch (error: any) {
       console.error("Error fetching messages:", error);
       toast.error(error?.response?.data?.message || "Unable to get messages");
@@ -95,13 +99,6 @@ export const useChatStore = create((set, get) => ({
       set((state: any) => {
         const { selectedUser, users } = state;
 
-        console.log(
-          "subscribe to unread count---->",
-          selectedUser,
-          users,
-          message
-        );
-
         const updatedUsers = users.map((user: userDataType) => {
           if (
             user.id === message.senderId &&
@@ -122,19 +119,13 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage");
   },
 
-  setSelectedUser: async (user: userDataType) => {
+  setSelectedUser: (user: userDataType) => {
     if (!user) {
       set({ selectedUser: user });
       return;
     }
-    const { users } = get() as { users: userDataType[] };
-    const updatedUsers = users.map((u) =>
-      u.id === user.id ? { ...u, unreadCount: 0 } : u
-    );
-    await getMessages(user.id);
     set({
       selectedUser: { ...user, isRead: 0 },
-      users: updatedUsers,
     });
   },
 }));

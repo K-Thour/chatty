@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
-// import { useAuthStore } from "../store/useAuthStore";;
 import { Users } from "lucide-react";
 import SidebarSkeleton from "./Skeltons/SidebarSkelton";
 import { useAuthStore } from "../store/useAuthStore";
-import type {userDataType } from "../types.js";
+import type { userDataType } from "../types.js";
 
 const Sidebar = () => {
   const {
@@ -19,7 +18,7 @@ const Sidebar = () => {
     getUsers: () => {};
     users: userDataType[];
     selectedUser: userDataType;
-    setSelectedUser: (user: userDataType) => Promise<void>;
+    setSelectedUser: (user: userDataType) => {};
     isUsersLoading: boolean;
     subscribeToUnreadCount: () => {};
     unsubscribeFromUnreadCount: () => {};
@@ -34,7 +33,7 @@ const Sidebar = () => {
     () => unsubscribeFromUnreadCount();
   }, [getUsers]);
 
-  const filteredUsers:userDataType[] = showOnlineOnly
+  const filteredUsers: userDataType[] = showOnlineOnly
     ? users.filter((user: userDataType) => onlineUsers.includes(user.id))
     : users;
 
@@ -67,7 +66,7 @@ const Sidebar = () => {
         {filteredUsers.map((user: userDataType) => (
           <button
             key={user.id}
-            onClick={async() => await setSelectedUser(user)}
+            onClick={() =>setSelectedUser(user)}
             className={`
               w-full p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors
