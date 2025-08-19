@@ -12,8 +12,8 @@ const getUsers = async (req, res) => {
     let usersWithUnread = await Promise.all(
       users.map(async (user) => {
         const unreadCount = await Chat.countDocuments({
-          sender: user._id,
-          receiver: userId,
+          senderId: user._id,
+          receiverId: userId,
           isRead: false,
         });
 
@@ -32,8 +32,6 @@ const getUsers = async (req, res) => {
     usersWithUnread = usersWithUnread.sort(
       (a, b) => b.unreadCount - a.unreadCount
     );
-
-    console.log(usersWithUnread);
 
     res.status(200).json({
       message: "Users fetched successfully",
@@ -99,7 +97,8 @@ const sendMessage = async (req, res) => {
     await newMessage.save();
     // Emit the new message to the sender and receiver via socket.io
     const recieverSocketId = getUserSocketId(receiverId);
-    if (recieverSocketId) {
+    console.log("100----->",recieverSocketId);
+    if (receiverId) {
       io.to(recieverSocketId).emit("newMessage", newMessage);
     }
     res.status(201).json({

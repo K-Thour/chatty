@@ -12,6 +12,8 @@ const Sidebar = () => {
     selectedUser,
     setSelectedUser,
     isUsersLoading,
+    subscribeToUnreadCount,
+    unsubscribeFromUnreadCount,
   }: any = useChatStore();
 
   const { onlineUsers }: any = useAuthStore();
@@ -19,6 +21,8 @@ const Sidebar = () => {
 
   useEffect(() => {
     getUsers();
+    subscribeToUnreadCount();
+    ()=>unsubscribeFromUnreadCount();
   }, [getUsers]);
 
   const filteredUsers = showOnlineOnly
@@ -86,6 +90,10 @@ const Sidebar = () => {
                 {onlineUsers.includes(user.id) ? "Online" : "Offline"}
               </div>
             </div>
+
+            {user.unreadCount>0 && <div className="w-7 h-7 rounded-full bg-amber-400 text-black flex items-center justify-center">
+              {user.unreadCount}
+            </div>}
           </button>
         ))}
 

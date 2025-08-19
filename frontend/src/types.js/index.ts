@@ -11,6 +11,7 @@ export interface userDataType {
   id: string;
   name: string;
   profilePicture: string;
+  unreadCount:number;
 }
 
 export interface messageDataType {
@@ -20,6 +21,7 @@ export interface messageDataType {
   message?: string;
   receiverId: string;
   senderId: string;
+  isRead:boolean;
 }
 
 export interface getProfileDataType {

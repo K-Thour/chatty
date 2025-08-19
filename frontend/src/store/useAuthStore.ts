@@ -83,7 +83,6 @@ export const useAuthStore = create((set, get: any) => ({
   },
   connectSocket: () => {
     const { authUser, isSocketConnected } = get();
-    console.log(authUser, isSocketConnected);
     if (!authUser || isSocketConnected) return;
     const socket = io(BACKEND_URL, {
       autoConnect: true,
@@ -96,7 +95,6 @@ export const useAuthStore = create((set, get: any) => ({
     socket.connect();
     set({ socket, isSocketConnected: true });
     socket.on("getOnlineUsers", (userIds) => {
-      console.log("Online users:", userIds);
       set({ onlineUsers: userIds });
     });
   },

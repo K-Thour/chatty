@@ -2,6 +2,11 @@ import { create } from "zustand";
 import { getMessages, getUsers, sendMessage } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
+import type {
+  authUserDataType,
+  messageDataType,
+  userDataType,
+} from "../types.js";
 
 export const useChatStore = create((set, get) => ({
   messages: [],
@@ -25,7 +30,6 @@ export const useChatStore = create((set, get) => ({
     set({ isMessagesLoading: true });
     try {
       const messages = await getMessages(userId);
-      console.log("Fetched messages: ----> 27", messages);
       set({ messages: messages.messages });
     } catch (error: any) {
       console.error("Error fetching messages:", error);
@@ -38,7 +42,6 @@ export const useChatStore = create((set, get) => ({
   sendMessage: async (message: any) => {
     try {
       const { selectedUser, messages }: any = get();
-      console.log("message is:--->", message);
       const response = await sendMessage(selectedUser.id, message);
       set(() => ({
         messages: [...messages, response.messageData],
@@ -50,14 +53,28 @@ export const useChatStore = create((set, get) => ({
   },
 
   subscribeToMessages: () => {
-    const { selectedUser }: any = get();
+    const { selectedUser } = get() as {
+      selectedUser?: userDataType;
+    };
+
     if (!selectedUser) return;
-    const { socket }: any = useAuthStore.getState();
-    socket.on("newMessage", (message: any) => {
-      if (message.senderId !== selectedUser.id) return;
-      set((state: any) => ({
-        messages: [...state.messages, message],
-      }));
+
+    const { socket } = useAuthStore.getState() as {
+      socket: any;
+    };
+
+    socket.on("newMessage", async (message: messageDataType) => {
+      const { selectedUser, messages } = get() as {
+        selectedUser: userDataType;
+        messages: messageDataType[];
+      };
+      await getMessages(selectedUser?.id);
+      set({
+        messages:
+          selectedUser?.id === message.senderId
+            ? [...messages, message]
+            : messages,
+      });
     });
   },
 
@@ -66,7 +83,54 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage");
   },
 
-  setSelectedUser: (user: any) => {
-    set({ selectedUser: user });
+  subscribeToUnreadCount: () => {
+  const { authUser, socket } = useAuthStore.getState() as {
+    authUser: authUserDataType;
+    socket: any;
+  };
+
+  if (!authUser) return;
+
+  socket.on("newMessage", (message: messageDataType) => {
+    set((state: any) => {
+      const { selectedUser, users } = state;
+
+      console.log("subscribe to unread count---->", selectedUser, users, message);
+
+      const updatedUsers = users.map((user: userDataType) => {
+        if (
+          user.id === message.senderId &&
+          selectedUser?.id !== message.senderId // not the open chat
+        ) {
+          return { ...user, unreadCount: (user.unreadCount ?? 0) + 1 };
+        }
+        return user;
+      });
+
+      return { users: updatedUsers };
+    });
+  });
+},
+
+
+  unsubscribeFromUnreadCount: () => {
+    const { socket }: any = useAuthStore.getState();
+    socket.off("newMessage");
+  },
+
+  setSelectedUser: async (user: userDataType) => {
+    if (!user) {
+      set({ selectedUser: user });
+      return;
+    }
+    const { users } = get() as { users: userDataType[] };
+    const updatedUsers = users.map((u) =>
+      u.id === user.id ? { ...u, unreadCount: 0 } : u
+    );
+
+    set({
+      selectedUser: { ...user, isRead: 0 },
+      users: updatedUsers,
+    });
   },
 }));
