@@ -84,34 +84,38 @@ export const useChatStore = create((set, get) => ({
   },
 
   subscribeToUnreadCount: () => {
-  const { authUser, socket } = useAuthStore.getState() as {
-    authUser: authUserDataType;
-    socket: any;
-  };
+    const { authUser, socket } = useAuthStore.getState() as {
+      authUser: authUserDataType;
+      socket: any;
+    };
 
-  if (!authUser) return;
+    if (!authUser) return;
 
-  socket.on("newMessage", (message: messageDataType) => {
-    set((state: any) => {
-      const { selectedUser, users } = state;
+    socket.on("newMessage", (message: messageDataType) => {
+      set((state: any) => {
+        const { selectedUser, users } = state;
 
-      console.log("subscribe to unread count---->", selectedUser, users, message);
+        console.log(
+          "subscribe to unread count---->",
+          selectedUser,
+          users,
+          message
+        );
 
-      const updatedUsers = users.map((user: userDataType) => {
-        if (
-          user.id === message.senderId &&
-          selectedUser?.id !== message.senderId // not the open chat
-        ) {
-          return { ...user, unreadCount: (user.unreadCount ?? 0) + 1 };
-        }
-        return user;
+        const updatedUsers = users.map((user: userDataType) => {
+          if (
+            user.id === message.senderId &&
+            selectedUser?.id !== message.senderId // not the open chat
+          ) {
+            return { ...user, unreadCount: (user.unreadCount ?? 0) + 1 };
+          }
+          return user;
+        });
+
+        return { users: updatedUsers };
       });
-
-      return { users: updatedUsers };
     });
-  });
-},
-
+  },
 
   unsubscribeFromUnreadCount: () => {
     const { socket }: any = useAuthStore.getState();
@@ -127,7 +131,7 @@ export const useChatStore = create((set, get) => ({
     const updatedUsers = users.map((u) =>
       u.id === user.id ? { ...u, unreadCount: 0 } : u
     );
-
+    await getMessages(user.id);
     set({
       selectedUser: { ...user, isRead: 0 },
       users: updatedUsers,

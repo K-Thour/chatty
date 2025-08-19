@@ -4,6 +4,7 @@ import { useChatStore } from "../store/useChatStore";
 import { Users } from "lucide-react";
 import SidebarSkeleton from "./Skeltons/SidebarSkelton";
 import { useAuthStore } from "../store/useAuthStore";
+import type {userDataType } from "../types.js";
 
 const Sidebar = () => {
   const {
@@ -14,7 +15,15 @@ const Sidebar = () => {
     isUsersLoading,
     subscribeToUnreadCount,
     unsubscribeFromUnreadCount,
-  }: any = useChatStore();
+  } = useChatStore() as {
+    getUsers: () => {};
+    users: userDataType[];
+    selectedUser: userDataType;
+    setSelectedUser: (user: userDataType) => Promise<void>;
+    isUsersLoading: boolean;
+    subscribeToUnreadCount: () => {};
+    unsubscribeFromUnreadCount: () => {};
+  };
 
   const { onlineUsers }: any = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
@@ -22,11 +31,11 @@ const Sidebar = () => {
   useEffect(() => {
     getUsers();
     subscribeToUnreadCount();
-    ()=>unsubscribeFromUnreadCount();
+    () => unsubscribeFromUnreadCount();
   }, [getUsers]);
 
-  const filteredUsers = showOnlineOnly
-    ? users.filter((user: any) => onlineUsers.includes(user.id))
+  const filteredUsers:userDataType[] = showOnlineOnly
+    ? users.filter((user: userDataType) => onlineUsers.includes(user.id))
     : users;
 
   if (isUsersLoading) return <SidebarSkeleton />;
@@ -55,13 +64,14 @@ const Sidebar = () => {
       </div>
 
       <div className="overflow-y-auto w-full py-3">
-        {filteredUsers.map((user: any) => (
+        {filteredUsers.map((user: userDataType) => (
           <button
             key={user.id}
-            onClick={() => setSelectedUser(user)}
+            onClick={async() => await setSelectedUser(user)}
             className={`
               w-full p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors
+              relative
               ${
                 selectedUser?.id === user.id
                   ? "bg-base-300 ring-1 ring-base-300"
@@ -81,6 +91,11 @@ const Sidebar = () => {
                   rounded-full ring-2 ring-zinc-900"
                 />
               )}
+              {user.unreadCount > 0 && (
+                <span className="w-7 h-7 flex items-center justify-center rounded-full bg-amber-400 text-black absolute -top-2 -right-2 size-3">
+                  {user.unreadCount}
+                </span>
+              )}
             </div>
 
             {/* User info - only visible on larger screens */}
@@ -90,10 +105,6 @@ const Sidebar = () => {
                 {onlineUsers.includes(user.id) ? "Online" : "Offline"}
               </div>
             </div>
-
-            {user.unreadCount>0 && <div className="w-7 h-7 rounded-full bg-amber-400 text-black flex items-center justify-center">
-              {user.unreadCount}
-            </div>}
           </button>
         ))}
 
