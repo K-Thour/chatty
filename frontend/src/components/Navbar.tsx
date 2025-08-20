@@ -1,18 +1,33 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NotificationDropdown from "./NotificationDropdown";
 import { useNotificationStore } from "../store/useNotificationStore";
-import type { NotificationDataType } from "../types.js";
+import type { authUserDataType, NotificationDataType } from "../types.js";
 
 const Navbar = () => {
-  const { logout, authUser }: any = useAuthStore();
+  const { logout, authUser } = useAuthStore() as {
+    logout: () => {};
+    authUser: authUserDataType;
+  };
   const [displayNotifications, setDisplayNotifications] = useState(false);
-  const { notifications, notificationsCount } = useNotificationStore() as {
+  const {
+    notifications,
+    notificationsCount,
+    subscribeToNotifications,
+    unsubscribeToNotifications,
+  } = useNotificationStore() as {
     notifications: NotificationDataType[];
     notificationsCount: number;
+    subscribeToNotifications: () => {};
+    unsubscribeToNotifications: () => {};
   };
+
+  useEffect(() => {
+    subscribeToNotifications();
+    () => unsubscribeToNotifications();
+  }, []);
 
   return (
     <header
@@ -57,9 +72,17 @@ const Navbar = () => {
                 >
                   <MessageSquare className="size-5" />
                   <span className="hidden sm:inline">Notifications</span>
+                  {notificationsCount>0 && <span className="bg-amber-400 rounded-full w-4 h-4 flex justify-center items-center absolute top-4 right-46">
+                    {notificationsCount}
+                  </span>}
                 </button>
 
-                {displayNotifications && <NotificationDropdown />}
+                {displayNotifications && (
+                  <NotificationDropdown
+                    notifications={notifications}
+                    setDisplayNotifications={setDisplayNotifications}
+                  />
+                )}
 
                 <button className="flex gap-2 items-center" onClick={logout}>
                   <LogOut className="size-5" />

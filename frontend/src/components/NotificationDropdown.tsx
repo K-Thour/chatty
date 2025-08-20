@@ -3,10 +3,11 @@ import { useChatStore } from "../store/useChatStore";
 import type { NotificationDataType, userDataType } from "../types.js";
 
 interface notoficationDropDownInterface{
-  
+  notifications:NotificationDataType[],
+  setDisplayNotifications: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NotificationDropdown = ({notifications,setDisplayNotifications}) => {
+const NotificationDropdown = ({notifications,setDisplayNotifications}:notoficationDropDownInterface) => {
   const { setSelectedUser, users } = useChatStore() as {
     setSelectedUser: (user: userDataType) => {};
     users: userDataType[];
@@ -18,6 +19,7 @@ const NotificationDropdown = ({notifications,setDisplayNotifications}) => {
         setSelectedUser(user);
       }
     });
+    setDisplayNotifications((prev)=>!prev)
   };
   return (
     <div className="absolute top-15 right-35 w-72 bg-base-100 shadow-lg rounded-xl border border-base-300 overflow-hidden">
@@ -28,7 +30,7 @@ const NotificationDropdown = ({notifications,setDisplayNotifications}) => {
 
       <div className="max-h-64 overflow-y-auto">
         {notifications.length > 0 ? (
-          notifications.map((n) => (
+          notifications.map((n:NotificationDataType) => (
             <div
               onClick={() => handleNotificationRedriction(n.userId)}
               key={n.userId}
