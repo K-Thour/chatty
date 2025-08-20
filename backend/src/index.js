@@ -13,7 +13,7 @@ const port = process.env.PORT || 3000;
 const baseUrl = "api/v1";
 app.use(
   cors({
-    origin: [process.env.CORS_ORIGIN, "http://localhost:5173"],
+    origin: [process.env.CORS_ORIGIN, "http://localhost:5173","http://localhost:4173"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })

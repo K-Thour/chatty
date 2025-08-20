@@ -1,19 +1,31 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
+import { useState } from "react";
+import NotificationDropdown from "./NotificationDropdown";
+import { useNotificationStore } from "../store/useNotificationStore";
+import type { NotificationDataType } from "../types.js";
 
 const Navbar = () => {
-  const { logout, authUser }:any = useAuthStore();
+  const { logout, authUser }: any = useAuthStore();
+  const [displayNotifications, setDisplayNotifications] = useState(false);
+  const { notifications, notificationsCount } = useNotificationStore() as {
+    notifications: NotificationDataType[];
+    notificationsCount: number;
+  };
 
   return (
     <header
       className="bg-base-100 border-b border-base-300 fixed w-full top-0 z-40 
     backdrop-blur-lg"
     >
-      <div className="container mx-auto px-4 h-16">
-        <div className="flex items-center justify-between h-full">
-          <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2.5 hover:opacity-80 transition-all">
+      <div className="container mx-auto px-4 h-16  ">
+        <div className="flex items-center justify-between h-full  ">
+          <div className="flex items-center gap-8  ">
+            <Link
+              to="/"
+              className="flex items-center gap-2.5 hover:opacity-80 transition-all"
+            >
               <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MessageSquare className="w-5 h-5 text-primary" />
               </div>
@@ -26,7 +38,6 @@ const Navbar = () => {
               to={"/settings"}
               className={`
               btn btn-sm gap-2 transition-colors
-              
               `}
             >
               <Settings className="w-4 h-4" />
@@ -39,6 +50,16 @@ const Navbar = () => {
                   <User className="size-5" />
                   <span className="hidden sm:inline">Profile</span>
                 </Link>
+
+                <button
+                  className={`btn btn-sm gap-2`}
+                  onClick={() => setDisplayNotifications((prev) => !prev)}
+                >
+                  <MessageSquare className="size-5" />
+                  <span className="hidden sm:inline">Notifications</span>
+                </button>
+
+                {displayNotifications && <NotificationDropdown />}
 
                 <button className="flex gap-2 items-center" onClick={logout}>
                   <LogOut className="size-5" />

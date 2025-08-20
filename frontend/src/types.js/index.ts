@@ -71,3 +71,9 @@ export interface sendMessageDataType{
     messageData:messageDataType;
   }
 }
+
+export interface NotificationDataType {
+  userId: string;
+  text: string;
+  time: string;
+}
