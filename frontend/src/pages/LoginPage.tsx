@@ -23,12 +23,18 @@ function LoginPage() {
       toast.error("Invalid email format");
       return false;
     }
-    if(!formData.password || formData.password.length < 8) {
+    if (!formData.password || formData.password.length < 8) {
       toast.error("Password must be at least 8 characters long");
       return false;
     }
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password)) {
-      toast.error("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character");
+    if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(
+        formData.password
+      )
+    ) {
+      toast.error(
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+      );
       return false;
     }
     if (formData.password.includes(" ")) {
@@ -82,12 +88,12 @@ function LoginPage() {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-200"
+              className="w-full px-3 py-2 border outline-none rounded focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-blue-500"
             />
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Password</label>
-            <div className="flex focus:ring focus:ring-blue-200 border rounded focus:outline-none items-center">
+            <div className="flex items-center border rounded focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-blue-500">
               <input
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
@@ -95,14 +101,14 @@ function LoginPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                className="w-full px-3 py-2 "
+                className="w-full px-3 py-2 border-none outline-none"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="me-3 text-sm text-blue-500 hover:underline"
               >
-                {showPassword ? <Eye/> : <EyeOff/>}
+                {showPassword ? <Eye /> : <EyeOff />}
               </button>
             </div>
           </div>

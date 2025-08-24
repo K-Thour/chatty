@@ -98,7 +98,7 @@ function SignUpPage() {
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-200"
+              className="w-full px-3 py-2 border rounded focus:outline-none focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-blue-500"
             />
           </div>
           <div className="mb-4">
@@ -110,12 +110,12 @@ function SignUpPage() {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-200"
+              className="w-full px-3 py-2 border rounded focus:outline-none focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-blue-500"
             />
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Password</label>
-            <div className="flex focus:ring focus:ring-blue-200 border rounded focus:outline-none items-center">
+            <div className="flex border rounded focus:outline-none items-center focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-blue-500">
               <input
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
@@ -123,7 +123,7 @@ function SignUpPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                className="w-full px-3 py-2 "
+                className="w-full px-3 py-2 border-none outline-none"
               />
               <button
                 type="button"
