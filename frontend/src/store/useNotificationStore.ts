@@ -23,10 +23,10 @@ export const useNotificationStore = create((set, get) => ({
         notifications: NotificationDataType[];
         notificationsCount: number;
       };
-      const { users } = useChatStore() as { users: userDataType[] };
+      const { users,selectedUser } = useChatStore.getState() as { users: userDataType[],selectedUser:userDataType };
       let senderName;
       users.map((user) => {
-        if (user.id === message.senderId) {
+        if (user.id === message.senderId && message.senderId !==selectedUser?.id) {
           senderName = user.name;
         }
       });
@@ -44,5 +44,8 @@ export const useNotificationStore = create((set, get) => ({
   unSubscribeFromNotifications: () => {
     const { socket }: any = useAuthStore.getState();
     socket.off("newMessage");
+  },
+  emptyNotifications:()=>{
+      set({notificationsCount:0,notifications:[]});
   },
 }));

@@ -28,7 +28,7 @@ const signUp = async (req, res) => {
       return res.status(400).json({ message: "Invalid user data" });
     }
     const savedUser = await newUser.save();
-    const token=generateJWT(savedUser._id, res);
+    const token = generateJWT(savedUser._id, res);
     res.status(201).json({
       message: "User registered successfully",
       token,
@@ -54,17 +54,17 @@ const login = async (req, res) => {
         errors: errors.array(),
       });
     }
-    const user = await User.findOne({ email });
+    const regexEmail = new RegExp(`^${email}$`, "i");
+    const user = await User.findOne({ email: regexEmail });
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
-
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const token=generateJWT(user._id, res);
+    const token = generateJWT(user._id, res);
     res.status(200).json({
       message: "User logged in successfully",
       token,

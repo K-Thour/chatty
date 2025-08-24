@@ -17,17 +17,26 @@ const Navbar = () => {
     notificationsCount,
     subscribeToNotifications,
     unsubscribeToNotifications,
+    emptyNotifications,
   } = useNotificationStore() as {
     notifications: NotificationDataType[];
     notificationsCount: number;
     subscribeToNotifications: () => {};
     unsubscribeToNotifications: () => {};
+    emptyNotifications:()=>{}
   };
 
   useEffect(() => {
     subscribeToNotifications();
     () => unsubscribeToNotifications();
   }, []);
+
+  const handleNotification=()=>{
+    setDisplayNotifications((prev) => !prev);
+    if(displayNotifications){
+      emptyNotifications();
+    }
+  }
 
   return (
     <header
@@ -68,13 +77,15 @@ const Navbar = () => {
 
                 <button
                   className={`btn btn-sm gap-2`}
-                  onClick={() => setDisplayNotifications((prev) => !prev)}
+                  onClick={handleNotification}
                 >
                   <MessageSquare className="size-5" />
                   <span className="hidden sm:inline">Notifications</span>
-                  {notificationsCount>0 && <span className="bg-amber-400 rounded-full w-4 h-4 flex justify-center items-center absolute top-4 right-46">
-                    {notificationsCount}
-                  </span>}
+                  {notificationsCount > 0 && (
+                    <span className="bg-amber-400 rounded-full text-black w-4 h-4 flex justify-center items-center absolute top-4 right-46">
+                      {notificationsCount}
+                    </span>
+                  )}
                 </button>
 
                 {displayNotifications && (

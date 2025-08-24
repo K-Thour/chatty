@@ -66,7 +66,7 @@ const Sidebar = () => {
         {filteredUsers.map((user: userDataType) => (
           <button
             key={user.id}
-            onClick={() =>setSelectedUser(user)}
+            onClick={() => setSelectedUser(user)}
             className={`
               w-full p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors
@@ -91,7 +91,7 @@ const Sidebar = () => {
                 />
               )}
               {user.unreadCount > 0 && (
-                <span className="w-7 h-7 flex items-center justify-center rounded-full bg-amber-400 text-black absolute -top-2 -right-2 size-3">
+                <span className="w-6 h-6 flex items-center justify-center rounded-full text-center bg-amber-400 text-black absolute -top-2 -right-2 size-3">
                   {user.unreadCount}
                 </span>
               )}
