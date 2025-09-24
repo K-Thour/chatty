@@ -44,6 +44,11 @@ const Navbar = () => {
     resetNotificationsCount: () => {};
   };
 
+   useEffect(() => {
+    subscribeToNotifications();
+    () => unsubscribeToNotifications();
+  }, []);
+
   // Example: mock API call or filter
   useEffect(() => {
     if (searchQuery.trim() === "") {
