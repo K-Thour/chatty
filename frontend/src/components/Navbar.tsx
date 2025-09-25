@@ -7,13 +7,18 @@ import {
   User,
   Search,
   UserPlus,
-  Send,
   Inbox,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import NotificationDropdown from "./NotificationDropdown";
 import { useNotificationStore } from "../store/useNotificationStore";
-import type { authUserDataType, NotificationDataType } from "../types.js";
+import type {
+  authUserDataType,
+  NotificationDataType,
+  Request,
+  SearchUser,
+} from "../types.js";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore() as {
@@ -24,11 +29,11 @@ const Navbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchedPersons, setSearchedPersons] = useState<
-    { id: string; name: string }[]
+    SearchUser[]
   >([]);
   const [showRequestsMenu, setShowRequestsMenu] = useState(false);
-  const [sentRequests, setSentRequests] = useState<any[]>([]);
-  const [receivedRequests, setReceivedRequests] = useState<any[]>([]);
+  const [sentRequests, setSentRequests] = useState<Request[]>([]);
+  const [receivedRequests, setReceivedRequests] = useState<Request[]>([]);
 
   const {
     notifications,
@@ -44,7 +49,7 @@ const Navbar = () => {
     resetNotificationsCount: () => {};
   };
 
-   useEffect(() => {
+  useEffect(() => {
     subscribeToNotifications();
     () => unsubscribeToNotifications();
   }, []);
@@ -57,10 +62,10 @@ const Navbar = () => {
     }
 
     // mock results (replace with API fetch)
-    const mockUsers = [
-      { id: "1", name: "Karanveer Singh" },
-      { id: "2", name: "Aman Sharma" },
-      { id: "3", name: "Harpreet Kaur" },
+    const mockUsers:SearchUser[] = [
+      { id: "1", name: "Karanveer Singh",imageUrl:"https://res.cloudinary.com/dszgssbnh/image/upload/v1757748337/chatty/68c51c4a52c9c9ddca0d8c5d.jpg" },
+      { id: "2", name: "Aman Sharma",imageUrl:"https://res.cloudinary.com/dszgssbnh/image/upload/v1757748337/chatty/68c51c4a52c9c9ddca0d8c5d.jpg"  },
+      { id: "3", name: "Harpreet Kaur",imageUrl:"https://res.cloudinary.com/dszgssbnh/image/upload/v1757748337/chatty/68c51c4a52c9c9ddca0d8c5d.jpg"  },
     ];
 
     const filtered = mockUsers.filter((p) =>
@@ -71,12 +76,18 @@ const Navbar = () => {
   }, [searchQuery]);
 
   const handleNotification = () => {
+    setShowRequestsMenu(false);
     setDisplayNotifications((prev) => {
       const newState = !prev;
       if (newState) resetNotificationsCount();
       return newState;
     });
   };
+
+  const handleShowRequestMenu=()=>{
+    setDisplayNotifications(false);
+    setShowRequestsMenu(prev=>!prev);
+  }
 
   const handleSearchToggle = () => {
     setShowSearch((prev) => !prev);
@@ -88,8 +99,8 @@ const Navbar = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleSendRequest = (id: string) => {
-    console.log("Send friend request to:", id);
+  const handleSendRequest = (id: string, status: boolean) => {
+    console.log("Send friend request to:", id, status);
     // call API here
   };
 
@@ -141,9 +152,13 @@ const Navbar = () => {
                         key={person.id}
                         className="flex justify-between items-center px-3 py-2 hover:bg-base-200 cursor-pointer"
                       >
+                        <img
+                            src={person.imageUrl}
+                            className="w-6 h-6 rounded-full"
+                          />
                         <span>{person.name}</span>
                         <button
-                          onClick={() => handleSendRequest(person.id)}
+                          onClick={() => handleSendRequest(person.id, true)}
                           className="btn btn-xs btn-primary gap-1"
                         >
                           <UserPlus className="w-4 h-4" />
@@ -200,7 +215,7 @@ const Navbar = () => {
                 {/* Requests Menu */}
                 <button
                   className="btn btn-sm gap-2 relative"
-                  onClick={() => setShowRequestsMenu((prev) => !prev)}
+                  onClick={handleShowRequestMenu}
                 >
                   <Inbox className="w-5 h-5" />
                   <span className="hidden sm:inline">Requests</span>
@@ -212,8 +227,11 @@ const Navbar = () => {
                     {sentRequests.length > 0 ? (
                       sentRequests.map((r) => (
                         <div key={r.id} className="flex items-center gap-2 p-1">
-                          <Send className="w-4 h-4 text-blue-500" />
+                          <img src={r.imageUrl} className="w-6 h-6 rounded-full" />
                           <span>{r.name}</span>
+                          <button className="btn btn-xs btn-secondary ml-auto">
+                            Cancel
+                          </button>
                         </div>
                       ))
                     ) : (
@@ -224,10 +242,16 @@ const Navbar = () => {
                     {receivedRequests.length > 0 ? (
                       receivedRequests.map((r) => (
                         <div key={r.id} className="flex items-center gap-2 p-1">
-                          <User className="w-4 h-4 text-green-500" />
+                          <img
+                            src={r.imageUrl}
+                            className="w-6 h-6 rounded-full"
+                          />
                           <span>{r.name}</span>
                           <button className="btn btn-xs btn-success ml-auto">
                             Accept
+                          </button>
+                          <button className="btn btn-xs btn-secondary ml-auto">
+                            Reject
                           </button>
                         </div>
                       ))

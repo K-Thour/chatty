@@ -11,7 +11,7 @@ export interface userDataType {
   id: string;
   name: string;
   profilePicture: string;
-  unreadCount:number;
+  unreadCount: number;
 }
 
 export interface messageDataType {
@@ -21,7 +21,7 @@ export interface messageDataType {
   message?: string;
   receiverId: string;
   senderId: string;
-  isRead:boolean;
+  isRead: boolean;
 }
 
 export interface getProfileDataType {
@@ -65,15 +65,27 @@ export interface getMessagesDataType {
   };
 }
 
-export interface sendMessageDataType{
-  data:{
-    message:string;
-    messageData:messageDataType;
-  }
+export interface sendMessageDataType {
+  data: {
+    message: string;
+    messageData: messageDataType;
+  };
 }
 
 export interface NotificationDataType {
   userId: string;
   text: string;
   time: string;
+}
+
+export interface Request {
+  id: string;
+  name: string;
+  imageUrl: string;
+}
+
+export interface SearchUser {
+  id: string;
+  name: string;
+  imageUrl: string;
 }
