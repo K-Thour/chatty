@@ -25,8 +25,8 @@ const Sidebar = () => {
     () => unsubscribeFromUnreadCount();
   }, [getFriends]);
 
-  const filteredUsers: userDataType[] = showOnlineOnly
-    ? friends.filter((user: userDataType) => onlineUsers.includes(user.id))
+  const filteredUsers: any[] = showOnlineOnly
+    ? friends.filter((user: any) => onlineUsers.includes(user.id))
     : friends;
 
   if (isFriendsLoading) return <SidebarSkeleton />;
