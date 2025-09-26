@@ -1,3 +1,5 @@
+export type RequestStatus = "accepted" | "pending" | "rejected";
+
 export interface authUserDataType {
   email: string;
   id: string;
@@ -45,10 +47,7 @@ export interface logoutDataType {
 }
 
 export interface getUsersDataType {
-  data: {
-    message: string;
-    users: userDataType[];
-  };
+  data:userDataType[]
 }
 
 export interface updateProfileDataType {
@@ -88,4 +87,8 @@ export interface SearchUser {
   id: string;
   name: string;
   imageUrl: string;
+}
+
+export interface SendRequestBody{
+  status:RequestStatus
 }

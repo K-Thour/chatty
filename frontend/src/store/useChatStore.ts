@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getMessages, getUsers, sendMessage } from "../lib/axios";
+import { getUsers as fetchUsers, getMessages, sendMessage } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
 import type {
@@ -8,24 +8,54 @@ import type {
   userDataType,
 } from "../types.js";
 
-export const useChatStore = create((set, get) => ({
+export interface ChatStore {
+  // state
+  messages: messageDataType[];
+  users: userDataType[];
+  selectedUser: userDataType | null;
+  isUsersLoading: boolean;
+  isMessagesLoading: boolean;
+
+  // actions
+  getUsers: (query: string) => Promise<void>;
+  resetUsers:()=>void;
+  getMessages: (userId: string) => Promise<void>;
+  sendMessage: (message: any) => Promise<void>;
+
+  subscribeToMessages: () => void;
+  unsubscribeFromMessages: () => void;
+
+  subscribeToUnreadCount: () => void;
+  unsubscribeFromUnreadCount: () => void;
+
+  setSelectedUser: (user: userDataType | null) => void;
+}
+
+export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   users: [],
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
-  getUsers: async () => {
+
+  getUsers: async (query: string) => {
     set({ isUsersLoading: true });
     try {
-      const users = await getUsers();
-      set({ users: users.users });
+      const users = await fetchUsers(query);
+      console.log(users);
+      set({users:users});
     } catch (error: any) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching friends:", error);
       toast.error(error?.response?.data?.message || "Unable to get users");
     } finally {
       set({ isUsersLoading: false });
     }
   },
+
+  resetUsers:()=>{
+    set({users:[]});
+  },
+
   getMessages: async (userId: string) => {
     set({ isMessagesLoading: true });
     try {
@@ -119,7 +149,7 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage");
   },
 
-  setSelectedUser: (user: userDataType) => {
+  setSelectedUser: (user: any) => {
     if (!user) {
       set({ selectedUser: user });
       return;

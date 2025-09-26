@@ -8,6 +8,7 @@ import type {
   logoutDataType,
   messageDataType,
   sendMessageDataType,
+  SendRequestBody,
   updateProfileDataType,
   userDataType,
 } from "../types.js";
@@ -104,18 +105,18 @@ export const updateProfile = async (
   }
 };
 
-export const getUsers = async (): Promise<{
-  message: string;
-  users: userDataType[];
-}> => {
+export const getUsers=async (query:string)=>{
   try {
-    const response: getUsersDataType = await instance.get("/chat/users");
+    console.log(query);
+     const response = await instance.get(
+      `/user/getUsers/${query}`,
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
     throw error;
   }
-};
+}
 
 export const getMessages = async (
   userId: string
@@ -149,6 +150,78 @@ export const sendMessage = async (
     return response.data;
   } catch (error) {
     console.error("Error sending message:", error);
+    throw error;
+  }
+};
+
+export const sendRequest = async (friendId: string) => {
+  try {
+    console.log(friendId);
+    const response: sendMessageDataType = await instance.put(
+      `/friend/request/${friendId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error sending request:", error);
+    throw error;
+  }
+};
+
+export const handleRequest = async (id: string, body: SendRequestBody) => {
+  try {
+    const response: sendMessageDataType = await instance.put(
+      `/friend/${id}`,
+      body
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error handling request:", error);
+    throw error;
+  }
+};
+
+export const getFriends = async (): Promise<userDataType[]> => {
+  try {
+    const response: getUsersDataType = await instance.get("/chat/friends");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching friends:", error);
+    throw error;
+  }
+};
+
+export const getAllPending=async()=>{
+  try {
+    const response: sendMessageDataType = await instance.get(
+      `friend/pending/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pending requests:", error);
+    throw error;
+  }
+};
+
+export const deleteSendRequest=async(id:string)=>{
+  try {
+    const response: sendMessageDataType = await instance.delete(
+      `friend/cancel/${id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pending requests:", error);
+    throw error;
+  }
+};
+
+export const getAllPendingReceivedRequests=async()=>{
+  try {
+    const response: sendMessageDataType = await instance.get(
+      `friend/pending/recieved`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pending requests:", error);
     throw error;
   }
 };

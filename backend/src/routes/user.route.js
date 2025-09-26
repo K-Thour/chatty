@@ -77,4 +77,39 @@ router.put("/update", middlewares.protect, controllers.user.updateProfile);
  */
 router.get("/profile", middlewares.protect, controllers.user.getProfile);
 
+/**
+ * @swagger
+ * /getUsers/{query}:
+ *   get:
+ *     summary: Search users
+ *     description: Returns a list of users whose name or email matches the query string. Excludes the authenticated user.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: query
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Search term to filter users by name or email.
+ *         example: john
+ *     responses:
+ *       200:
+ *         description: List of matching users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid query
+ *       401:
+ *         description: Unauthorized (no or invalid token)
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/getUsers/:query", middlewares.protect, controllers.user.findUsers);
+
 export default router;

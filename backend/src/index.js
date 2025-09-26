@@ -13,7 +13,11 @@ const port = process.env.PORT || 3000;
 const baseUrl = "api/v1";
 app.use(
   cors({
-    origin: [process.env.CORS_ORIGIN, "http://localhost:5173","http://localhost:4173"],
+    origin: [
+      process.env.CORS_ORIGIN,
+      "http://localhost:5173",
+      "http://localhost:4173",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
@@ -26,6 +30,7 @@ setupSwagger(app);
 app.use(`/${baseUrl}/auth`, routes.authRoutes);
 app.use(`/${baseUrl}/user`, routes.userRoutes);
 app.use(`/${baseUrl}/chat`, routes.chatRoutes);
+app.use(`/${baseUrl}/friend`, routes.friendRoutes);
 
 server.listen(port, async () => {
   await database.connectDB();

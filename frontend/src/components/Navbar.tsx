@@ -17,8 +17,11 @@ import type {
   authUserDataType,
   NotificationDataType,
   Request,
-  SearchUser,
+  SendRequestBody,
 } from "../types.js";
+import { useChatStore, type ChatStore } from "../store/useChatStore.js";
+import { useFriendStore, type FriendStore } from "../store/useFriendStore.js";
+import Spinner from "./Loader/Loader.js";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore() as {
@@ -28,12 +31,7 @@ const Navbar = () => {
   const [displayNotifications, setDisplayNotifications] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchedPersons, setSearchedPersons] = useState<
-    SearchUser[]
-  >([]);
   const [showRequestsMenu, setShowRequestsMenu] = useState(false);
-  const [sentRequests, setSentRequests] = useState<Request[]>([]);
-  const [receivedRequests, setReceivedRequests] = useState<Request[]>([]);
 
   const {
     notifications,
@@ -49,30 +47,31 @@ const Navbar = () => {
     resetNotificationsCount: () => {};
   };
 
+  const { getUsers, users, resetUsers } = useChatStore() as ChatStore;
+
+  const {
+    sendRequest,
+    getAllPending,
+    sentPendingRequests,
+    isRequestsLoading,
+    receivedRequests,
+    deleteSendRequest,
+    getAllPendingReceivedRequests,
+    handleRequest,
+    getFriends,
+  } = useFriendStore() as FriendStore;
+
   useEffect(() => {
     subscribeToNotifications();
     () => unsubscribeToNotifications();
   }, []);
-
+  const fetchUsers = async (query: string) => {
+    await getUsers(query);
+  };
   // Example: mock API call or filter
+
   useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setSearchedPersons([]);
-      return;
-    }
-
-    // mock results (replace with API fetch)
-    const mockUsers:SearchUser[] = [
-      { id: "1", name: "Karanveer Singh",imageUrl:"https://res.cloudinary.com/dszgssbnh/image/upload/v1757748337/chatty/68c51c4a52c9c9ddca0d8c5d.jpg" },
-      { id: "2", name: "Aman Sharma",imageUrl:"https://res.cloudinary.com/dszgssbnh/image/upload/v1757748337/chatty/68c51c4a52c9c9ddca0d8c5d.jpg"  },
-      { id: "3", name: "Harpreet Kaur",imageUrl:"https://res.cloudinary.com/dszgssbnh/image/upload/v1757748337/chatty/68c51c4a52c9c9ddca0d8c5d.jpg"  },
-    ];
-
-    const filtered = mockUsers.filter((p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    setSearchedPersons(filtered);
+    searchQuery.length ? fetchUsers(searchQuery) : resetUsers();
   }, [searchQuery]);
 
   const handleNotification = () => {
@@ -84,24 +83,47 @@ const Navbar = () => {
     });
   };
 
-  const handleShowRequestMenu=()=>{
+  const handleShowRequestMenu = async () => {
     setDisplayNotifications(false);
-    setShowRequestsMenu(prev=>!prev);
-  }
+    setShowRequestsMenu((prev) => !prev);
+    if (!showRequestsMenu) {
+      await Promise.all([getAllPending(), getAllPendingReceivedRequests()]);
+    }
+  };
 
   const handleSearchToggle = () => {
     setShowSearch((prev) => !prev);
     setSearchQuery("");
-    setSearchedPersons([]);
+    resetUsers();
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  const handleSendRequest = (id: string, status: boolean) => {
-    console.log("Send friend request to:", id, status);
-    // call API here
+  const handleSendRequest = async (id: string) => {
+    await sendRequest(id);
+  };
+
+  const handleDeleteRequest = async (id: string) => {
+    await deleteSendRequest(id);
+    await getAllPending();
+  };
+
+  const handleReceivedRequest = async (id: string, status: boolean) => {
+    const body: SendRequestBody = {
+      status: "pending",
+    };
+    if (status) {
+      body.status = "accepted";
+    } else {
+      body.status = "rejected";
+    }
+    await handleRequest(id, body);
+    await getAllPendingReceivedRequests();
+    if(status){
+      await getFriends();
+    }
   };
 
   return (
@@ -145,20 +167,20 @@ const Navbar = () => {
                 />
 
                 {/* Dropdown results */}
-                {searchedPersons.length > 0 && (
+                {users.length > 0 && (
                   <div className="absolute mt-1 w-full bg-base-100 border border-base-300 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-                    {searchedPersons.map((person) => (
+                    {users.map((person: any) => (
                       <div
-                        key={person.id}
+                        key={person._id}
                         className="flex justify-between items-center px-3 py-2 hover:bg-base-200 cursor-pointer"
                       >
                         <img
-                            src={person.imageUrl}
-                            className="w-6 h-6 rounded-full"
-                          />
+                          src={person.profilePicture}
+                          className="w-6 h-6 rounded-full"
+                        />
                         <span>{person.name}</span>
                         <button
-                          onClick={() => handleSendRequest(person.id, true)}
+                          onClick={() => handleSendRequest(person._id)}
                           className="btn btn-xs btn-primary gap-1"
                         >
                           <UserPlus className="w-4 h-4" />
@@ -223,13 +245,29 @@ const Navbar = () => {
 
                 {showRequestsMenu && (
                   <div className="absolute top-14 right-0 bg-white shadow-lg rounded-lg p-3 w-72">
+                    {isRequestsLoading && (
+                      <Spinner
+                        size={6}
+                        color="green-500"
+                        text="Loading requests..."
+                      />
+                    )}
                     <h3 className="font-bold mb-2">Sent Requests</h3>
-                    {sentRequests.length > 0 ? (
-                      sentRequests.map((r) => (
-                        <div key={r.id} className="flex items-center gap-2 p-1">
-                          <img src={r.imageUrl} className="w-6 h-6 rounded-full" />
-                          <span>{r.name}</span>
-                          <button className="btn btn-xs btn-secondary ml-auto">
+                    {sentPendingRequests.length > 0 && !isRequestsLoading ? (
+                      sentPendingRequests.map((r) => (
+                        <div
+                          key={r.friendId._id}
+                          className="flex items-center gap-2 p-1"
+                        >
+                          <img
+                            src={r.friendId.profilePicture}
+                            className="w-6 h-6 rounded-full"
+                          />
+                          <span>{r.friendId.name}</span>
+                          <button
+                            className="btn btn-xs btn-secondary ml-auto"
+                            onClick={() => handleDeleteRequest(r.friendId._id)}
+                          >
                             Cancel
                           </button>
                         </div>
@@ -239,18 +277,27 @@ const Navbar = () => {
                     )}
 
                     <h3 className="font-bold mt-3 mb-2">Received Requests</h3>
-                    {receivedRequests.length > 0 ? (
+                    {receivedRequests.length > 0 && !isRequestsLoading ? (
                       receivedRequests.map((r) => (
-                        <div key={r.id} className="flex items-center gap-2 p-1">
+                        <div
+                          key={r.friendId._id}
+                          className="flex items-center gap-2 p-1"
+                        >
                           <img
-                            src={r.imageUrl}
+                            src={r.friendId.profilePicture}
                             className="w-6 h-6 rounded-full"
                           />
-                          <span>{r.name}</span>
-                          <button className="btn btn-xs btn-success ml-auto">
+                          <span>{r.friendId.name}</span>
+                          <button
+                            className="btn btn-xs btn-success ml-auto"
+                            onClick={() => handleReceivedRequest(r._id, true)}
+                          >
                             Accept
                           </button>
-                          <button className="btn btn-xs btn-secondary ml-auto">
+                          <button
+                            className="btn btn-xs btn-secondary ml-auto"
+                            onClick={() => handleReceivedRequest(r._id, false)}
+                          >
                             Reject
                           </button>
                         </div>

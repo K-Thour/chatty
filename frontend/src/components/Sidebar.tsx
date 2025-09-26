@@ -4,40 +4,32 @@ import { Users } from "lucide-react";
 import SidebarSkeleton from "./Skeltons/SidebarSkelton";
 import { useAuthStore } from "../store/useAuthStore";
 import type { userDataType } from "../types.js";
+import { useFriendStore, type FriendStore } from "../store/useFriendStore.js";
 
 const Sidebar = () => {
   const {
-    getUsers,
-    users,
     selectedUser,
     setSelectedUser,
-    isUsersLoading,
     subscribeToUnreadCount,
     unsubscribeFromUnreadCount,
-  } = useChatStore() as {
-    getUsers: () => {};
-    users: userDataType[];
-    selectedUser: userDataType;
-    setSelectedUser: (user: userDataType) => {};
-    isUsersLoading: boolean;
-    subscribeToUnreadCount: () => {};
-    unsubscribeFromUnreadCount: () => {};
-  };
+  } = useChatStore() ;
+
+  const {getFriends,friends,isFriendsLoading}=useFriendStore() as FriendStore;
 
   const { onlineUsers }: any = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   useEffect(() => {
-    getUsers();
+    getFriends();
     subscribeToUnreadCount();
     () => unsubscribeFromUnreadCount();
-  }, [getUsers]);
+  }, [getFriends]);
 
   const filteredUsers: userDataType[] = showOnlineOnly
-    ? users.filter((user: userDataType) => onlineUsers.includes(user.id))
-    : users;
+    ? friends.filter((user: userDataType) => onlineUsers.includes(user.id))
+    : friends;
 
-  if (isUsersLoading) return <SidebarSkeleton />;
+  if (isFriendsLoading) return <SidebarSkeleton />;
 
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">

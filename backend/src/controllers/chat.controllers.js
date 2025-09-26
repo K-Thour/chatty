@@ -1,42 +1,49 @@
 import { uploadImage } from "../libs/cloudinary/cloudinary.js";
 import { getUserSocketId, io } from "../libs/socket.js";
 import Chat from "../models/chat.model.js";
-import User from "../models/user.model.js";
+import Friend from "../models/friends.model.js";
 
-const getUsers = async (req, res) => {
+const getFriends = async (req, res) => {
   const userId = req.user._id;
   try {
-    const users = await User.find({ _id: { $ne: userId } }).select("-password");
+    // Find all accepted friendships involving this user
+    const friendships = await Friend.find({
+      $or: [{ userId }, { friendId: userId }],
+      status: "accepted",
+    })
+      .populate("userId", "name email description profilePicture")  
+      .populate("friendId", "name email description profilePicture"); // populate friendId
 
-    let usersWithUnread = await Promise.all(
-      users.map(async (user) => {
+    // Map to get the other user in the friendship
+    const usersWithUnread = await Promise.all(
+      friendships.map(async (friendship) => {
+        // Determine who is the other user
+        const otherUser =
+          friendship.userId._id.toString() === userId.toString()
+            ? friendship.friendId
+            : friendship.userId;
+
+        // Count unread messages from that user
         const unreadCount = await Chat.countDocuments({
-          senderId: user._id,
+          senderId: otherUser._id,
           receiverId: userId,
           isRead: false,
         });
 
         return {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          description: user.description,
-          profilePicture: user.profilePicture,
+          id: otherUser._id,
+          name: otherUser.name,
+          email: otherUser.email,
+          description: otherUser.description,
+          profilePicture: otherUser.profilePicture,
           unreadCount,
         };
       })
     );
 
-    usersWithUnread = usersWithUnread.sort(
-      (a, b) => b.unreadCount - a.unreadCount
-    );
-
-    res.status(200).json({
-      message: "Users fetched successfully",
-      users: usersWithUnread,
-    });
+    return res.json(usersWithUnread);
   } catch (error) {
-    console.error("Error fetching users:", error);
+    console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -115,7 +122,7 @@ const sendMessage = async (req, res) => {
 };
 
 export default {
-  getUsers,
+  getFriends,
   getMessages,
   sendMessage,
 };

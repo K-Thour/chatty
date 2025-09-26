@@ -59,7 +59,39 @@ const getProfile = (req, res) => {
   }
 };
 
+const findUsers = async (req, res) => {
+  try {
+    const userId=req.user._id;
+    const search = req.params.query;
+
+    // Build search filter
+    let filter = {};
+
+    if (search) {
+      filter = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },   // case-insensitive
+          { email: { $regex: search, $options: "i" } },
+        ],
+      };
+    }
+
+    // Exclude current user
+    if (userId) {
+      filter._id = { $ne: userId };
+    }
+
+    const users = await User.find(filter).select("-password"); // exclude password
+
+    return res.json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export default {
   updateProfile,
   getProfile,
+  findUsers,
 };
