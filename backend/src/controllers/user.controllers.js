@@ -1,4 +1,5 @@
 import { replaceImage } from "../libs/cloudinary/cloudinary.js";
+import Friend from "../models/friends.model.js";
 import User from "../models/user.model.js";
 
 const updateProfile = async (req, res) => {
@@ -59,28 +60,39 @@ const getProfile = (req, res) => {
   }
 };
 
-const findUsers = async (req, res) => {
+export const findUsers = async (req, res) => {
   try {
-    const userId=req.user._id;
+    const userId = req.user._id;
     const search = req.params.query;
 
-    // Build search filter
+    // Step 1: Build search filter
     let filter = {};
 
     if (search) {
       filter = {
         $or: [
-          { name: { $regex: search, $options: "i" } },   // case-insensitive
+          { name: { $regex: search, $options: "i" } }, // case-insensitive
           { email: { $regex: search, $options: "i" } },
         ],
       };
     }
 
-    // Exclude current user
-    if (userId) {
-      filter._id = { $ne: userId };
-    }
+    const relations = await Friend.find({
+      $or: [{ userId }, { friendId: userId }],
+      status: { $in: ["pending", "accepted"] },
+    });
 
+    const excludedIds = new Set([userId.toString()]); // always exclude self
+
+    relations.forEach((rel) => {
+      excludedIds.add(rel.userId.toString());
+      excludedIds.add(rel.friendId.toString());
+    });
+
+    // Step 4: Apply exclusion
+    filter._id = { $nin: Array.from(excludedIds) };
+
+    // Step 5: Fetch users
     const users = await User.find(filter).select("-password"); // exclude password
 
     return res.json(users);
