@@ -7,22 +7,16 @@ import type { userDataType } from "../types.js";
 import { useFriendStore, type FriendStore } from "../store/useFriendStore.js";
 
 const Sidebar = () => {
-  const {
-    selectedUser,
-    setSelectedUser,
-    subscribeToUnreadCount,
-    unsubscribeFromUnreadCount,
-  } = useChatStore() ;
+  const { selectedUser, setSelectedUser } = useChatStore();
 
-  const {getFriends,friends,isFriendsLoading}=useFriendStore() as FriendStore;
+  const { getFriends, friends, isFriendsLoading, resetUnreadCount } =
+    useFriendStore() as FriendStore;
 
   const { onlineUsers }: any = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   useEffect(() => {
     getFriends();
-    subscribeToUnreadCount();
-    () => unsubscribeFromUnreadCount();
   }, [getFriends]);
 
   const filteredUsers: any[] = showOnlineOnly
@@ -58,7 +52,7 @@ const Sidebar = () => {
         {filteredUsers.map((user: userDataType) => (
           <button
             key={user.id}
-            onClick={() => setSelectedUser(user)}
+            onClick={() => { setSelectedUser(user); resetUnreadCount(user.id); }}
             className={`
               w-full p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors

@@ -1,9 +1,7 @@
 import { create } from "zustand";
 import { getUsers as fetchUsers, getMessages, sendMessage } from "../lib/axios";
 import toast from "react-hot-toast";
-import { useAuthStore } from "./useAuthStore";
 import type {
-  authUserDataType,
   messageDataType,
   userDataType,
 } from "../types.js";
@@ -18,16 +16,9 @@ export interface ChatStore {
 
   // actions
   getUsers: (query: string) => Promise<void>;
-  resetUsers:()=>void;
+  resetUsers: () => void;
   getMessages: (userId: string) => Promise<void>;
   sendMessage: (message: any) => Promise<void>;
-
-  subscribeToMessages: () => void;
-  unsubscribeFromMessages: () => void;
-
-  subscribeToUnreadCount: () => void;
-  unsubscribeFromUnreadCount: () => void;
-
   setSelectedUser: (user: userDataType | null) => void;
 }
 
@@ -42,8 +33,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set({ isUsersLoading: true });
     try {
       const users = await fetchUsers(query);
-      console.log(users);
-      set({users:users});
+      set({ users: users });
     } catch (error: any) {
       console.error("Error fetching friends:", error);
       toast.error(error?.response?.data?.message || "Unable to get users");
@@ -52,8 +42,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
-  resetUsers:()=>{
-    set({users:[]});
+  resetUsers: () => {
+    set({ users: [] });
   },
 
   getMessages: async (userId: string) => {
@@ -85,70 +75,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       toast.error(error?.response?.data?.message || "Unable to send message");
     }
   },
-
-  subscribeToMessages: () => {
-    const { selectedUser } = get() as {
-      selectedUser?: userDataType;
-    };
-
-    if (!selectedUser) return;
-
-    const { socket } = useAuthStore.getState() as {
-      socket: any;
-    };
-
-    socket.on("newMessage", async (message: messageDataType) => {
-      const { selectedUser, messages } = get() as {
-        selectedUser: userDataType;
-        messages: messageDataType[];
-      };
-      await getMessages(selectedUser?.id);
-      set({
-        messages:
-          selectedUser?.id === message.senderId
-            ? [...messages, message]
-            : messages,
-      });
-    });
-  },
-
-  unsubscribeFromMessages: () => {
-    const { socket }: any = useAuthStore.getState();
-    socket.off("newMessage");
-  },
-
-  subscribeToUnreadCount: () => {
-    const { authUser, socket } = useAuthStore.getState() as {
-      authUser: authUserDataType;
-      socket: any;
-    };
-
-    if (!authUser) return;
-
-    socket.on("newMessage", (message: messageDataType) => {
-      set((state: any) => {
-        const { selectedUser, users } = state;
-
-        const updatedUsers = users.map((user: userDataType) => {
-          if (
-            user.id === message.senderId &&
-            selectedUser?.id !== message.senderId // not the open chat
-          ) {
-            return { ...user, unreadCount: (user.unreadCount ?? 0) + 1 };
-          }
-          return user;
-        });
-
-        return { users: updatedUsers };
-      });
-    });
-  },
-
-  unsubscribeFromUnreadCount: () => {
-    const { socket }: any = useAuthStore.getState();
-    socket.off("newMessage");
-  },
-
   setSelectedUser: (user: any) => {
     if (!user) {
       set({ selectedUser: user });

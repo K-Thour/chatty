@@ -8,17 +8,10 @@ import {
   Search,
   UserPlus,
   Inbox,
-  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import NotificationDropdown from "./NotificationDropdown";
-import { useNotificationStore } from "../store/useNotificationStore";
-import type {
-  authUserDataType,
-  NotificationDataType,
-  Request,
-  SendRequestBody,
-} from "../types.js";
+import type { authUserDataType, SendRequestBody } from "../types.js";
 import { useChatStore, type ChatStore } from "../store/useChatStore.js";
 import { useFriendStore, type FriendStore } from "../store/useFriendStore.js";
 import Spinner from "./Loader/Loader.js";
@@ -36,16 +29,10 @@ const Navbar = () => {
   const {
     notifications,
     notificationsCount,
-    subscribeToNotifications,
-    unsubscribeToNotifications,
     resetNotificationsCount,
-  } = useNotificationStore() as {
-    notifications: NotificationDataType[];
-    notificationsCount: number;
-    subscribeToNotifications: () => {};
-    unsubscribeToNotifications: () => {};
-    resetNotificationsCount: () => {};
-  };
+    subscribeToUnreadCount,
+    unsubscribeFromUnreadCount,
+  } = useFriendStore() as FriendStore;
 
   const { getUsers, users, resetUsers } = useChatStore() as ChatStore;
 
@@ -62,8 +49,8 @@ const Navbar = () => {
   } = useFriendStore() as FriendStore;
 
   useEffect(() => {
-    subscribeToNotifications();
-    () => unsubscribeToNotifications();
+    subscribeToUnreadCount();
+    () => unsubscribeFromUnreadCount();
   }, []);
   const fetchUsers = async (query: string) => {
     await getUsers(query);
@@ -103,6 +90,7 @@ const Navbar = () => {
 
   const handleSendRequest = async (id: string) => {
     await sendRequest(id);
+    await fetchUsers(searchQuery);
   };
 
   const handleDeleteRequest = async (id: string) => {
@@ -121,7 +109,7 @@ const Navbar = () => {
     }
     await handleRequest(id, body);
     await getAllPendingReceivedRequests();
-    if(status){
+    if (status) {
       await getFriends();
     }
   };
@@ -244,7 +232,7 @@ const Navbar = () => {
                 </button>
 
                 {showRequestsMenu && (
-                  <div className="absolute top-14 right-0 bg-white shadow-lg rounded-lg p-3 w-72">
+                  <div className="absolute top-14 right-0 shadow-lg rounded-lg p-3 w-72">
                     {isRequestsLoading && (
                       <Spinner
                         size={6}
@@ -256,7 +244,7 @@ const Navbar = () => {
                     {sentPendingRequests.length > 0 && !isRequestsLoading ? (
                       sentPendingRequests.map((r) => (
                         <div
-                          key={r.friendId._id}
+                          key={r.friendId.id}
                           className="flex items-center gap-2 p-1"
                         >
                           <img
@@ -266,21 +254,21 @@ const Navbar = () => {
                           <span>{r.friendId.name}</span>
                           <button
                             className="btn btn-xs btn-secondary ml-auto"
-                            onClick={() => handleDeleteRequest(r.friendId._id)}
+                            onClick={() => handleDeleteRequest(r.friendId.id)}
                           >
                             Cancel
                           </button>
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-gray-500">No sent requests</p>
+                      <p className="text-sm">No sent requests</p>
                     )}
 
                     <h3 className="font-bold mt-3 mb-2">Received Requests</h3>
                     {receivedRequests.length > 0 && !isRequestsLoading ? (
                       receivedRequests.map((r) => (
                         <div
-                          key={r.friendId._id}
+                          key={r.friendId.id}
                           className="flex items-center gap-2 p-1"
                         >
                           <img
@@ -290,22 +278,20 @@ const Navbar = () => {
                           <span>{r.friendId.name}</span>
                           <button
                             className="btn btn-xs btn-success ml-auto"
-                            onClick={() => handleReceivedRequest(r._id, true)}
+                            onClick={() => handleReceivedRequest(r.id, true)}
                           >
                             Accept
                           </button>
                           <button
                             className="btn btn-xs btn-secondary ml-auto"
-                            onClick={() => handleReceivedRequest(r._id, false)}
+                            onClick={() => handleReceivedRequest(r.id, false)}
                           >
                             Reject
                           </button>
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-gray-500">
-                        No received requests
-                      </p>
+                      <p className="text-sm">No received requests</p>
                     )}
                   </div>
                 )}

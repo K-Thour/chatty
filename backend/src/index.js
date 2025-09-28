@@ -34,5 +34,4 @@ app.use(`/${baseUrl}/friend`, routes.friendRoutes);
 
 server.listen(port, async () => {
   await database.connectDB();
-  console.log(`Server is running on port ${port}`);
 });

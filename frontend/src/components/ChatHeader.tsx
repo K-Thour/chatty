@@ -1,10 +1,23 @@
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
+import { useFriendStore } from "../store/useFriendStore";
+import { useState } from "react";
+import DeleteModal from "./modals/DeleteModal";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser }: any = useChatStore();
-  const { onlineUsers }:any = useAuthStore();
+  const { onlineUsers }: any = useAuthStore();
+  const { removeFriend, getFriends } = useFriendStore();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const handleDeleteModal = () => {
+    setIsDeleteModalOpen((prev) => !prev);
+  };
+  const handleRemoveFriend = async (id: string) => {
+    await removeFriend(id);
+    setSelectedUser(null);
+    await getFriends();
+  };
   return (
     <div className="p-2.5 border-b border-base-300">
       <div className="flex items-center justify-between">
@@ -28,10 +41,29 @@ const ChatHeader = () => {
           </div>
         </div>
 
-        {/* Close button */}
-        <button onClick={() => setSelectedUser(null)}>
-          <X />
-        </button>
+        <div className="flex items-center gap-3 ">
+          <button
+            className="p-1 rounded-md hover:bg-base-200 active:bg-base-300"
+            onClick={() => handleDeleteModal()}
+          >
+            <Trash2 className="hover:text-red-500" />
+          </button>
+
+          {/* Close button */}
+          <button
+            className="p-1 rounded-md hover:bg-base-200 active:bg-base-300"
+            onClick={() => setSelectedUser(null)}
+          >
+            <X className="hover:text-red-300" />
+          </button>
+        </div>
+        {isDeleteModalOpen && (
+          <DeleteModal
+            name={selectedUser.name}
+            onDelete={() => handleRemoveFriend(selectedUser.id)}
+            onCancel={handleDeleteModal}
+          />
+        )}
       </div>
     </div>
   );

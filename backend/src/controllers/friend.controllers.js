@@ -129,6 +129,19 @@ export const getAllRequests = async (req, res) => {
   }
 };
 
+export const removeFriend = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const friendId = req.params.id;
+
+    await Friend.findOneAndDelete({ userId, friendId });
+
+    res.json({ message: "Friend removed successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 export default {
   sendRequest,
   handleStatus,
@@ -136,5 +149,6 @@ export default {
   getPendingRequests,
   deleteRequest,
   getReceivedRequests,
-  getAllRequests
+  getAllRequests,
+  removeFriend,
 };

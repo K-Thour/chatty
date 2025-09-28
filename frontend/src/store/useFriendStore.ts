@@ -5,20 +5,30 @@ import {
   getAllPending as fetchAllPending,
   getFriends as fetchFriends,
   getAllPendingReceivedRequests,
+  getMessages,
   handleRequest,
+  removeFriend,
   sendRequest as sendFriendRequest,
 } from "../lib/axios";
-import type { SendRequestBody } from "../types.js";
+import type {
+  authUserDataType,
+  messageDataType,
+  NotificationDataType,
+  SendRequestBody,
+} from "../types.js";
+import { useAuthStore } from "./useAuthStore.js";
+import { useChatStore, type ChatStore } from "./useChatStore.js";
+import { formatMessageTime } from "../lib/utils.js";
 
-interface User {
-  _id: string;
+export interface User {
+  id: string;
   name: string;
   email: string;
   profilePicture?: string;
 }
 
 interface FriendRequest {
-  _id: string;
+  id: string;
   friendId: User;
   status: "pending" | "accepted" | "rejected";
 }
@@ -29,6 +39,8 @@ export interface FriendStore {
   isRequestsLoading: boolean;
   sentRequests: FriendRequest[];
   receivedRequests: FriendRequest[];
+  notifications: NotificationDataType[];
+  notificationsCount: number;
   sentPendingRequests: FriendRequest[];
   getFriends: () => Promise<void>;
   sendRequest: (friendId: string) => Promise<void>;
@@ -36,6 +48,12 @@ export interface FriendStore {
   deleteSendRequest: (id: string) => Promise<void>;
   getAllPendingReceivedRequests: () => Promise<void>;
   handleRequest: (id: string, body: SendRequestBody) => Promise<void>;
+  removeFriend: (id: string) => Promise<void>;
+  subscribeToUnreadCount: () => void;
+  unsubscribeFromUnreadCount: () => void;
+  emptyNotifications: () => void;
+  resetNotificationsCount: () => void;
+  resetUnreadCount: (id: string) => void;
 }
 
 export const useFriendStore = create<FriendStore>((set, get) => ({
@@ -45,6 +63,8 @@ export const useFriendStore = create<FriendStore>((set, get) => ({
   sentRequests: [],
   sentPendingRequests: [],
   receivedRequests: [],
+  notifications: [],
+  notificationsCount: 0,
   getFriends: async () => {
     set({ isFriendsLoading: true });
     try {
@@ -124,4 +144,89 @@ export const useFriendStore = create<FriendStore>((set, get) => ({
       set({ isRequestsLoading: false });
     }
   },
+  removeFriend: async (id: string) => {
+    set({ isRequestsLoading: true });
+    try {
+      const response = await removeFriend(id);
+      toast.success(response.message);
+    } catch (error: any) {
+      console.error("Error removing friend:", error);
+      toast.error(error?.response?.data?.message || "Unable to remove friend");
+    } finally {
+      set({ isRequestsLoading: false });
+    }
+  },
+
+  resetUnreadCount: (id: string) => {
+    set((state: any) => {
+      const updatedFriends = state.friends.map((friend: any) => {
+        if (friend.id === id) {
+          return { ...friend, unreadCount: 0 };
+        }
+        return friend;
+      });
+      return { friends: updatedFriends };
+    });
+  },
+
+  subscribeToUnreadCount: () => {
+    const { authUser, socket } = useAuthStore.getState() as {
+      authUser: authUserDataType;
+      socket: any;
+    };
+
+    if (!authUser) return;
+    socket.off("newMessage");
+    socket.on("newMessage", async (message: messageDataType) => {
+      const { selectedUser, messages } = useChatStore.getState() as ChatStore;
+      if (selectedUser?.id) {
+        await getMessages(selectedUser.id);
+        useChatStore.setState({
+          messages:
+            selectedUser?.id === message.senderId
+              ? [...messages, message]
+              : messages,
+        });
+      };
+      const { notifications, notificationsCount, emptyNotifications } = get() as FriendStore;
+      if (notificationsCount > 9) {
+        emptyNotifications();
+      }
+      set((state: any) => {
+        const { friends } = state as { friends: User[] };
+        let senderName;
+        const updatedFriends = friends.map((friend: any) => {
+          if (
+            friend.id === message.senderId &&
+            selectedUser?.id !== message.senderId // not the open chat
+          ) {
+            senderName = friend.name;
+            return { ...friend, unreadCount: (friend.unreadCount ?? 0) + 1 };
+          }
+          return friend;
+        });
+
+        const newNotification: NotificationDataType = {
+          userId: message.senderId,
+          text: `New message recieved from ${senderName}`,
+          time: formatMessageTime(message.createdAt),
+        };
+        return {
+          friends: updatedFriends,
+          notifications:
+            selectedUser?.id === message.senderId
+              ? notifications
+              : [newNotification, ...notifications],
+          notificationsCount: notificationsCount + 1,
+        };
+      });
+    });
+  },
+
+  unsubscribeFromUnreadCount: () => {
+    const { socket }: any = useAuthStore.getState();
+    socket.off("newMessage");
+  },
+  emptyNotifications: () => set({ notifications: [] }),
+  resetNotificationsCount: () => set({ notificationsCount: 0 }),
 }));

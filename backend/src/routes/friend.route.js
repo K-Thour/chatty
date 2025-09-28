@@ -197,6 +197,12 @@ router.get(
   controllers.friend.getReceivedRequests
 );
 
+router.delete(
+  "/:id",
+  middlewares.protect,
+  controllers.friend.removeFriend
+);
+
 router.get(
   "/requests",
   middlewares.protect,

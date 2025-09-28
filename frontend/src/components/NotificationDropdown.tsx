@@ -1,6 +1,7 @@
 import { Bell } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
-import type { NotificationDataType, userDataType } from "../types.js";
+import type { NotificationDataType } from "../types.js";
+import { useFriendStore } from "../store/useFriendStore.js";
 
 interface notoficationDropDownInterface {
   notifications: NotificationDataType[];
@@ -11,15 +12,14 @@ const NotificationDropdown = ({
   notifications,
   setDisplayNotifications,
 }: notoficationDropDownInterface) => {
-  const { setSelectedUser, users } = useChatStore() as {
-    setSelectedUser: (user: userDataType) => {};
-    users: userDataType[];
-  };
+  const { setSelectedUser } = useChatStore();
+  const { friends, resetUnreadCount } = useFriendStore();
 
   const handleNotificationRedriction = (userId: string) => {
-    users.map((user) => {
+    friends.map((user) => {
       if (user.id === userId) {
-        setSelectedUser(user);
+        setSelectedUser(user as any);
+        resetUnreadCount(user.id);
       }
     });
     setDisplayNotifications((prev) => !prev);

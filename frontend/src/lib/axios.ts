@@ -107,7 +107,6 @@ export const updateProfile = async (
 
 export const getUsers=async (query:string)=>{
   try {
-    console.log(query);
      const response = await instance.get(
       `/user/getUsers/${query}`,
     );
@@ -156,7 +155,6 @@ export const sendMessage = async (
 
 export const sendRequest = async (friendId: string) => {
   try {
-    console.log(friendId);
     const response: sendMessageDataType = await instance.put(
       `/friend/request/${friendId}`
     );
@@ -222,6 +220,18 @@ export const getAllPendingReceivedRequests=async()=>{
     return response.data;
   } catch (error) {
     console.error("Error fetching pending requests:", error);
+    throw error;
+  }
+};
+
+export const removeFriend=async(id:string)=>{
+  try {
+    const response: sendMessageDataType = await instance.delete(
+      `friend/${id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error removing friend:", error);
     throw error;
   }
 };
