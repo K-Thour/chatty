@@ -106,7 +106,7 @@ export const getReceivedRequests = async (req, res) => {
     const requests = await Friend.find({
       friendId: userId,
       status: "pending",
-    }).populate("friendId", "name email profilePicture");
+    }).populate("userId", "name email profilePicture");
 
     res.json(requests);
   } catch (err) {
