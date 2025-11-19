@@ -248,7 +248,7 @@ const Navbar = () => {
                           className="flex items-center gap-2 p-1"
                         >
                           <img
-                            src={r.friendId.profilePicture}
+                            src={r.friendId.profilePicture?.length?r.friendId.profilePicture:"/avatar.png"}
                             className="w-6 h-6 rounded-full"
                           />
                           <span>{r.friendId.name}</span>
@@ -268,14 +268,14 @@ const Navbar = () => {
                     {receivedRequests.length > 0 && !isRequestsLoading ? (
                       receivedRequests.map((r) => (
                         <div
-                          key={r.friendId.id}
+                          key={r.userId.id}
                           className="flex items-center gap-2 p-1"
                         >
                           <img
-                            src={r.friendId.profilePicture}
+                            src={r.userId.profilePicture?.length?r.userId.profilePicture:"/avatar.png"}
                             className="w-6 h-6 rounded-full"
                           />
-                          <span>{r.friendId.name}</span>
+                          <span>{r.userId.name}</span>
                           <button
                             className="btn btn-xs btn-success ml-auto"
                             onClick={() => handleReceivedRequest(r.id, true)}

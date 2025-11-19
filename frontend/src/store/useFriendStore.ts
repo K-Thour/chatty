@@ -30,6 +30,7 @@ export interface User {
 interface FriendRequest {
   id: string;
   friendId: User;
+  userId: User;
   status: "pending" | "accepted" | "rejected";
 }
 
