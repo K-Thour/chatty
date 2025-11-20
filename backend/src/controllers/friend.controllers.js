@@ -131,10 +131,16 @@ export const getAllRequests = async (req, res) => {
 
 export const removeFriend = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const friendId = req.params.id;
 
-    await Friend.findOneAndDelete({ userId, friendId });
+    await Friend.findOneAndDelete({
+      status: "accepted",
+      $or: [
+        { userId, friendId },
+        { userId: friendId, friendId: userId }
+      ]
+    });
 
     res.json({ message: "Friend removed successfully" });
   } catch (err) {
